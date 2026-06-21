@@ -58,7 +58,12 @@
       
       function checkResult() {
         const birthdayInput = document.getElementById("birthday");
-      const birthday =birthdayInput.value;
+        const birthday =birthdayInput.value;
+
+        if (!birthday) {
+          resultView.textContent = "Masukkan tahun lahir dulu"
+          return
+        }
       
         const now = new Date().getFullYear();
         const age = now - birthday

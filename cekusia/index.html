@@ -61,10 +61,10 @@
         const birthday =birthdayInput.value;
         const resultView = document.getElementById("resultView");
 
-        if (!birthday) {
-          resultView.textContent = "Masukkan tahun lahir dulu"
-          return
-        }
+     if (!birthday) {
+    resultView.textContent = "Masukkan tahun lahir dulu";
+    return;
+  }
       
         const now = new Date().getFullYear();
         const age = now - birthday

@@ -67,9 +67,13 @@
         }
         
         const now = new Date().getFullYear();
+        if (birthday > now) {
+          resultView.textContent = "Tahun lahir tidak valid";
+          return;
+        }
         const age = now - birthday;
         
-        resultView.innerHTML = "Usia anda saat ini adalah " + age + " tahun";
+        resultView.textContent = "Usia anda saat ini adalah " + age + " tahun";
       }
       
     </script>

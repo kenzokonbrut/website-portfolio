@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brat Generator High-Res (Multi-line, Case & Glow)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #8ace00;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        textarea {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background-color: #333;
+            color: white;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="color"] {
+            cursor: pointer;
+            width: 50px;
+            height: 40px;
+            border: none;
+            border-radius: 4px;
+            background: none;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #8ace00;
+            color: black;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #75b000;
+        }
+
+        .preview {
+            margin-top: 20px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            overflow: hidden;
+            background-image: linear-gradient(45deg, #333 25%, transparent 25%), 
+                              linear-gradient(-45deg, #333 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, #333 75%), 
+                              linear-gradient(-45deg, transparent 75%, #333 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Brat Generator</h1>
+        
+        <div class="controls">
+            <label for="textInput">Teks Kustom:</label>
+            <textarea id="textInput" placeholder="Ketik sesuatu...">Hello World</textarea>
+
+            <div class="color-row">
+                <label for="bgColor">Warna Latar:</label>
+                <input type="color" id="bgColor" value="#FFFFFF">
+            </div>
+
+            <label class="checkbox-row">
+                <input type="checkbox" id="transparentBg">
+                Latar Belakang Transparan
+            </label>
+
+            <button id="downloadBtn">Unduh Gambar (High-Res)</button>
+        </div>
+
+        <div class="preview">
+            <canvas id="bratCanvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('bratCanvas');
+        const ctx = canvas.getContext('2d');
+        const textInput = document.getElementById('textInput');
+        const bgColor = document.getElementById('bgColor');
+        const transparentBg = document.getElementById('transparentBg');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        const CANVAS_SIZE = 1080;
+        canvas.width = CANVAS_SIZE;
+        canvas.height = CANVAS_SIZE;
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Jika transparan TIDAK dicentang, gambar background warna
+            if (!transparentBg.checked) {
+                ctx.fillStyle = bgColor.value;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Matikan efek glow untuk latar berwarna agar tetap otentik
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+            } else {
+                // JIKA TRANSPARAN, AKTIFKAN EFEK GLOW
+                // Warna glow mengikuti warna background yang dipilih agar senada
+                ctx.shadowColor = bgColor.value; 
+                ctx.shadowBlur = 50; // Jarak pendaran cahaya
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+            }
+
+            const text = textInput.value || 'brat';
+            
+            ctx.fillStyle = '#000000';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            let fontSize = 200; 
+            ctx.font = `normal ${fontSize}px Arial, Helvetica, sans-serif`;
+            
+            const maxWidth = canvas.width - 150; 
+            
+            const words = text.split(/\s+/);
+            let maxWordWidth = 0;
+            for (let word of words) {
+                let width = ctx.measureText(word).width;
+                if (width > maxWordWidth) {
+                    maxWordWidth = width;
+                }
+            }
+
+            if (maxWordWidth > maxWidth) {
+                fontSize = fontSize * (maxWidth / maxWordWidth);
+                ctx.font = `normal ${fontSize}px Arial, Helvetica, sans-serif`;
+            }
+
+            let lines = [];
+            let currentLine = words[0] || '';
+
+            for (let i = 1; i < words.length; i++) {
+                let word = words[i];
+                let width = ctx.measureText(currentLine + " " + word).width;
+                if (width < maxWidth) {
+                    currentLine += " " + word;
+                } else {
+                    lines.push(currentLine);
+                    currentLine = word;
+                }
+            }
+            if (currentLine) {
+                lines.push(currentLine);
+            }
+
+            const lineHeight = fontSize * 1.1; 
+            const totalTextHeight = (lines.length - 1) * lineHeight;
+            const startY = (canvas.height / 2) - (totalTextHeight / 2);
+
+            for (let i = 0; i < lines.length; i++) {
+                // Teks digambar dengan efek glow aktif jika latar transparan
+                ctx.fillText(lines[i], canvas.width / 2, startY + (i * lineHeight));
+            }
+        }
+
+        textInput.addEventListener('input', draw);
+        bgColor.addEventListener('input', draw);
+        transparentBg.addEventListener('change', draw);
+
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            let fileName = textInput.value.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 15) || 'custom';
+            link.download = `brat-${fileName}.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+        });
+
+        // Gambar pertama kali saat halaman dimuat
+        draw();
+    </script>
+</body>
+</html>

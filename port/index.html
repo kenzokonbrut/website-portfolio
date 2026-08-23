@@ -3,365 +3,572 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kenzo — Executive Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Kenzo Cloud — Enterprise Developer Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #090a0f;
-            --surface: #111318;
-            --surface-hover: #161920;
+            --bg-base: #090a0f;
+            --bg-surface: #10131a;
+            --bg-surface-hover: #171b24;
+            --bg-input: #07090e;
+            
             --border: rgba(255, 255, 255, 0.08);
-            --border-active: rgba(255, 255, 255, 0.2);
+            --border-hover: rgba(255, 255, 255, 0.2);
+            --border-focus: #3b82f6;
+            
             --accent: #3b82f6;
             --accent-glow: rgba(59, 130, 246, 0.15);
-            --text-main: #f3f4f6;
-            --text-muted: #8e95a5;
-            --danger: #ef4444;
             --success: #10b981;
-            --radius: 12px;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --text-dim: #6b7280;
+            
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
         body {
-            background-color: var(--bg);
+            background-color: var(--bg-base);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.05), transparent 50%);
+            overflow-x: hidden;
         }
 
         .hidden { display: none !important; }
 
-        /* Toast Notification */
-        #toast {
-            position: fixed; top: 20px; right: 20px;
-            background: var(--surface); border: 1px solid var(--border);
-            padding: 12px 20px; border-radius: 8px; font-size: 0.85rem; font-weight: 500;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100;
-            transform: translateY(-20px); opacity: 0; transition: all 0.3s ease;
+        /* Toast Notifications */
+        #toast-container {
+            position: fixed; bottom: 24px; right: 24px; z-index: 1000;
+            display: flex; flex-direction: column; gap: 8px; pointer-events: none;
         }
-        #toast.show { transform: translateY(0); opacity: 1; }
+        .toast {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            padding: 12px 18px; border-radius: var(--radius-md); font-size: 0.825rem; font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6); pointer-events: auto;
+            transform: translateY(20px); opacity: 0; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; align-items: center; gap: 10px; max-width: 320px;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .toast.success .toast-dot { background: var(--success); }
+        .toast.error .toast-dot { background: var(--danger); }
+        .toast.info .toast-dot { background: var(--accent); }
 
-        /* --- AUTH CARD --- */
-        .auth-container { width: 100%; max-width: 400px; padding: 20px; }
+        /* --- AUTH SCREEN --- */
+        #auth-wrapper {
+            position: fixed; inset: 0; background: var(--bg-base); z-index: 500;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+            background-image: radial-gradient(circle at 50% 20%, rgba(59, 130, 246, 0.06), transparent 60%);
+        }
         .auth-card {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 32px;
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 40px; width: 100%; max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
         }
-        
-        .brand { text-align: center; margin-bottom: 28px; }
-        .brand-icon {
-            width: 40px; height: 40px; background: var(--text-main); color: var(--bg);
-            border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 1.1rem; margin-bottom: 12px;
+        .auth-logo {
+            width: 42px; height: 42px; background: var(--text-main); color: var(--bg-base);
+            border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1.2rem; margin-bottom: 20px;
         }
-        .brand h1 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em; }
-        .brand p { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
+        .auth-card h1 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 4px; }
+        .auth-card p { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 24px; }
 
-        .auth-toggle {
-            display: flex; background: rgba(0,0,0,0.3); border-radius: 8px;
-            padding: 3px; margin-bottom: 20px; border: 1px solid var(--border);
+        .auth-tabs {
+            display: flex; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 3px; margin-bottom: 20px;
         }
-        .toggle-btn {
-            flex: 1; padding: 8px; border: none; background: transparent;
-            color: var(--text-muted); font-size: 0.8rem; font-weight: 600;
-            border-radius: 6px; cursor: pointer; transition: 0.2s;
+        .auth-tab {
+            flex: 1; padding: 7px; border: none; background: transparent; color: var(--text-muted);
+            font-size: 0.8rem; font-weight: 500; border-radius: 4px; cursor: pointer; transition: 0.2s;
         }
-        .toggle-btn.active { background: var(--surface-hover); color: var(--text-main); }
+        .auth-tab.active { background: var(--bg-surface-hover); color: var(--text-main); font-weight: 600; }
 
-        .field { margin-bottom: 16px; }
-        .field label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
-        .field input, .field textarea {
-            width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border); border-radius: 8px; color: var(--text-main);
-            font-size: 0.875rem; outline: none; transition: 0.2s;
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+        .form-control {
+            width: 100%; padding: 10px 14px; background: var(--bg-input);
+            border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-main);
+            font-size: 0.875rem; outline: none; transition: border-color 0.2s;
         }
-        .field input:focus, .field textarea:focus { border-color: var(--accent); }
+        .form-control:focus { border-color: var(--border-focus); box-shadow: 0 0 0 2px var(--accent-glow); }
 
-        .btn-primary {
-            width: 100%; padding: 11px; background: var(--text-main); color: var(--bg);
-            border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem;
-            cursor: pointer; transition: opacity 0.2s; margin-top: 8px;
+        .btn {
+            width: 100%; padding: 10px 16px; border-radius: var(--radius-sm); font-weight: 500; font-size: 0.875rem;
+            cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none;
         }
+        .btn-primary { background: var(--text-main); color: var(--bg-base); }
         .btn-primary:hover { opacity: 0.9; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background: var(--bg-surface-hover); border-color: var(--border-hover); }
+        .btn-danger-soft { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .btn-danger-soft:hover { background: rgba(239, 68, 68, 0.2); }
 
-        .btn-secondary {
-            background: transparent; border: 1px solid var(--border); color: var(--text-main);
-            padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 500;
-            cursor: pointer; transition: 0.2s;
-        }
-        .btn-secondary:hover { background: var(--surface-hover); border-color: var(--border-active); }
-
-        /* --- DASHBOARD --- */
-        .app-container { width: 100%; max-width: 900px; padding: 40px 20px; }
-
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 32px;
-        }
-        .user-nav { display: flex; align-items: center; gap: 12px; }
-        .avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); }
-
-        .profile-banner {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 28px; display: flex;
-            justify-content: space-between; align-items: flex-start; margin-bottom: 32px;
-        }
-        .profile-details { display: flex; gap: 20px; align-items: center; }
-        .avatar-lg { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+        /* --- APP DASHBOARD LAYOUT --- */
+        #app-wrapper { display: flex; width: 100%; min-height: 100vh; }
         
-        .profile-text h2 { font-size: 1.2rem; font-weight: 600; }
-        .profile-text .role { color: var(--accent); font-size: 0.8rem; font-weight: 600; margin-top: 2px; }
-        .profile-text .bio { color: var(--text-muted); font-size: 0.85rem; margin-top: 8px; max-width: 500px; }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-        .card {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 20px; transition: 0.2s;
+        /* Sidebar */
+        aside {
+            width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; justify-content: space-between; padding: 24px 16px;
+            flex-shrink: 0;
         }
-        .card:hover { border-color: var(--border-active); }
-        .card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; }
-        .card p { color: var(--text-muted); font-size: 0.825rem; line-height: 1.5; }
+        .sidebar-top .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 20px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+        .brand-badge { width: 28px; height: 28px; background: var(--accent); color: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+        .brand-name { font-weight: 600; font-size: 0.9rem; letter-spacing: -0.01em; }
 
-        /* Modal */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
-            display: flex; align-items: center; justify-content: center; z-index: 50;
+        .nav-list { display: flex; flex-direction: column; gap: 4px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius-sm);
+            color: var(--text-muted); font-size: 0.85rem; font-weight: 500; text-decoration: none; cursor: pointer; transition: 0.15s;
         }
-        .modal-body {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 28px; width: 100%; max-width: 420px;
+        .nav-link:hover { background: var(--bg-surface-hover); color: var(--text-main); }
+        .nav-link.active { background: var(--bg-surface-hover); color: var(--text-main); font-weight: 600; }
+
+        .sidebar-user {
+            display: flex; align-items: center; justify-content: space-between; padding: 12px;
+            background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-md);
+        }
+        .user-mini { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+        .avatar-sm { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .user-meta .name { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+        .user-meta .email { font-size: 0.7rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+
+        /* Main Content Panel */
+        main { flex: 1; display: flex; flex-direction: column; background: var(--bg-base); overflow-y: auto; max-height: 100vh; }
+        
+        header.topbar {
+            height: 64px; border-bottom: 1px solid var(--border); display: flex; align-items: center;
+            justify-content: space-between; padding: 0 32px; background: rgba(16, 19, 26, 0.4); backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .topbar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: -0.01em; }
+        .topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+        .content-body { padding: 32px; max-width: 1000px; width: 100%; margin: 0 auto; }
+        .view-section { display: flex; flex-direction: column; gap: 24px; }
+
+        .section-header-flex { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
+        .section-title { font-size: 1.15rem; font-weight: 600; letter-spacing: -0.01em; }
+        .section-subtitle { font-size: 0.825rem; color: var(--text-muted); margin-top: 2px; }
+
+        /* Dashboard Overview & Cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+        .stat-card {
+            background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px;
+        }
+        .stat-card .label { font-size: 0.78rem; font-weight: 500; color: var(--text-muted); }
+        .stat-card .value { font-size: 1.6rem; font-weight: 700; margin: 8px 0 2px; letter-spacing: -0.02em; }
+        .stat-card .trend { font-size: 0.72rem; color: var(--success); display: flex; align-items: center; gap: 4px; }
+
+        .card-panel {
+            background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px;
+        }
+
+        /* Activity Log List */
+        .activity-item {
+            display: flex; align-items: center; justify-content: space-between; padding: 12px 0;
+            border-bottom: 1px solid var(--border); font-size: 0.85rem;
+        }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-desc { color: var(--text-muted); }
+        .activity-time { font-size: 0.75rem; color: var(--text-dim); }
+
+        /* Profile View Grid */
+        .profile-grid { display: grid; grid-template-columns: 240px 1fr; gap: 24px; }
+        @media(max-width: 768px) {
+            #app-wrapper { flex-direction: column; }
+            aside { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+            .profile-grid { grid-template-columns: 1fr; }
+        }
+
+        .avatar-preview-box {
+            text-align: center; background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px;
+        }
+        .avatar-lg { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+
+        .badge-status {
+            display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px;
+            background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--success); font-size: 0.72rem; font-weight: 600; border-radius: 20px;
         }
     </style>
 </head>
 <body>
 
-    <div id="toast">Notifikasi</div>
+    <div id="toast-container"></div>
 
-    <!-- 1. AUTHENTICATION SECTION -->
-    <div id="auth-view" class="auth-container">
+    <!-- 1. AUTHENTICATION VIEW -->
+    <div id="auth-wrapper">
         <div class="auth-card">
-            <div class="brand">
-                <div class="brand-icon">K</div>
-                <h1>Executive Portal</h1>
-                <p>Silakan masuk ke akun Anda</p>
+            <div class="auth-logo">K</div>
+            <h1 id="auth-title">Selamat Datang</h1>
+            <p id="auth-subtitle">Kelola platform dan infrastruktur Anda dengan aman.</p>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tab-login" onclick="switchAuthMode('login')">Masuk</button>
+                <button class="auth-tab" id="tab-signup" onclick="switchAuthMode('signup')">Daftar Akun</button>
             </div>
 
-            <div class="auth-toggle">
-                <button class="toggle-btn active" id="btn-tab-login" onclick="setAuthMode('login')">Login</button>
-                <button class="toggle-btn" id="btn-tab-signup" onclick="setAuthMode('signup')">Sign Up</button>
-            </div>
-
-            <form onsubmit="handleAuth(event)">
-                <div class="field hidden" id="field-name">
+            <form onsubmit="handleAuthSubmit(event)">
+                <div class="form-group hidden" id="group-fullname">
                     <label>Nama Lengkap</label>
-                    <input type="text" id="input-name" placeholder="Kenzo">
+                    <input type="text" id="input-fullname" class="form-control" placeholder="Kenzo Developer">
                 </div>
-                <div class="field">
-                    <label>Email</label>
-                    <input type="email" id="input-email" placeholder="nama@perusahaan.com" required>
+                <div class="form-group">
+                    <label>Email Perusahaan / Pribadi</label>
+                    <input type="email" id="input-email" class="form-control" placeholder="kenzo@admin.io" required>
                 </div>
-                <div class="field">
+                <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="input-password" placeholder="••••••••" required>
+                    <input type="password" id="input-password" class="form-control" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn-primary" id="btn-auth-submit">Masuk</button>
+                <button type="submit" class="btn btn-primary" id="btn-submit-text" style="margin-top: 6px;">Masuk ke Dashboard</button>
             </form>
+            <button class="btn btn-outline" style="margin-top: 10px;" onclick="loadDemoAccount()">⚡ Isi Data Demo Cepat</button>
         </div>
     </div>
 
-    <!-- 2. DASHBOARD & PROFILE SECTION -->
-    <div id="dashboard-view" class="app-container hidden">
-        <header>
-            <div style="font-weight: 700; font-size: 0.95rem; letter-spacing: -0.01em;">KENZO.PORTAL</div>
-            <div class="user-nav">
-                <img src="" id="nav-avatar" class="avatar" alt="Avatar">
-                <button class="btn-secondary" onclick="handleLogout()">Keluar</button>
+    <!-- 2. APP DASHBOARD VIEW -->
+    <div id="app-wrapper" class="hidden">
+        <!-- Sidebar Navigation -->
+        <aside>
+            <div class="sidebar-top">
+                <div class="brand">
+                    <div class="brand-badge">K</div>
+                    <span class="brand-name">Kenzo Cloud OS</span>
+                </div>
+                <div class="nav-list">
+                    <a class="nav-link active" onclick="switchView('overview', this)">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+                        Overview
+                    </a>
+                    <a class="nav-link" onclick="switchView('projects', this)">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        Infrastruktur & Proyek
+                    </a>
+                    <a class="nav-link" onclick="switchView('profile', this)">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Pengaturan Profil
+                    </a>
+                </div>
             </div>
-        </header>
 
-        <!-- User Profile Card -->
-        <div class="profile-banner">
-            <div class="profile-details">
-                <img src="" id="user-avatar" class="avatar-lg" alt="Avatar">
-                <div class="profile-text">
-                    <h2 id="user-name">-</h2>
-                    <div class="role" id="user-title">Tech Architect & CEO Aspirant</div>
-                    <div class="bio" id="user-bio">Mengelola arsitektur server, otomatisasi sistem, dan pengembangan ekosistem digital performa tinggi.</div>
+            <div class="sidebar-user">
+                <div class="user-mini">
+                    <img src="" id="sidebar-avatar" class="avatar-sm" alt="Avatar">
+                    <div class="user-meta">
+                        <div class="name" id="sidebar-name">-</div>
+                        <div class="email" id="sidebar-email">-</div>
+                    </div>
                 </div>
+                <button class="btn btn-outline" style="padding: 6px 10px; font-size: 0.75rem;" onclick="handleLogout()">Keluar</button>
             </div>
-            <button class="btn-secondary" onclick="toggleModal(true)">Edit Profil</button>
-        </div>
+        </aside>
 
-        <h3 style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em;">Proyek & Sistem Aktif</h3>
-        
-        <div class="grid">
-            <div class="card">
-                <h3>Server Infrastructure</h3>
-                <p>Manajemen cluster Pterodactyl Panel dengan konfigurasi resource otomatis dan proteksi DDoS terenkripsi.</p>
-            </div>
-            <div class="card">
-                <h3>Automation Bot API</h3>
-                <p>Otomatisasi pemrosesan pesan WhatsApp berbasis Baileys & REST API untuk integrasi sistem cepat.</p>
-            </div>
-            <div class="card">
-                <h3>Secure Authentication</h3>
-                <p>Sistem sesi lokal terisolasi dengan enkripsi bawaan dan manajemen profil interaktif.</p>
-            </div>
-        </div>
-    </div>
+        <!-- Main Workspace -->
+        <main>
+            <header class="topbar">
+                <div class="topbar-title" id="topbar-title">Overview Dashboard</div>
+                <div class="topbar-actions">
+                    <span class="badge-status">
+                        <span style="width:6px;height:6px;background:var(--success);border-radius:50%;"></span> 
+                        System Operational
+                    </span>
+                </div>
+            </header>
 
-    <!-- 3. EDIT PROFILE MODAL -->
-    <div id="profile-modal" class="modal hidden">
-        <div class="modal-body">
-            <h3 style="font-size: 1.1rem; margin-bottom: 16px;">Edit Profil Anda</h3>
-            <form onsubmit="handleSaveProfile(event)">
-                <div class="field">
-                    <label>Nama Lengkap</label>
-                    <input type="text" id="edit-name" required>
+            <div class="content-body">
+                <!-- VIEW 1: OVERVIEW -->
+                <div id="view-overview" class="view-section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="label">Server Uptime</div>
+                            <div class="value">99.99%</div>
+                            <div class="trend">↑ Optimal Performance</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Active Node Clusters</div>
+                            <div class="value">8 Active</div>
+                            <div class="trend">Auto-scaled securely</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Database Queries/sec</div>
+                            <div class="value">1.4k</div>
+                            <div class="trend">Latency &lt; 12ms</div>
+                        </div>
+                    </div>
+
+                    <div class="card-panel" style="margin-top: 8px;">
+                        <div class="section-header-flex" style="margin-bottom: 12px;">
+                            <div>
+                                <h3 class="section-title">Aktivitas Sesi Terakhir</h3>
+                                <div class="section-subtitle">Log autentikasi dan pembaruan sistem secara real-time</div>
+                            </div>
+                        </div>
+                        <div id="activity-log-container">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
                 </div>
-                <div class="field">
-                    <label>Jabatan / Title</label>
-                    <input type="text" id="edit-title" required>
+
+                <!-- VIEW 2: PROJECTS -->
+                <div id="view-projects" class="view-section hidden">
+                    <div class="section-header-flex">
+                        <div>
+                            <h3 class="section-title">Infrastruktur & Layanan</h3>
+                            <div class="section-subtitle">Daftar layanan node dan otomatisasi sistem server aktif</div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                        <div class="card-panel">
+                            <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 6px;">Pterodactyl Daemon Hub</h4>
+                            <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">Manajemen container server game otomatis dengan integrasi resource monitor dan auto-backup harian.</p>
+                            <span class="badge-status">Running • Port 8080</span>
+                        </div>
+                        <div class="card-panel">
+                            <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 6px;">WhatsApp Baileys Gateway</h4>
+                            <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">Sistem mikroservis berbasis multi-session untuk menangani webhook event dan integrasi notifikasi klien.</p>
+                            <span class="badge-status">Connected • Cluster #2</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="field">
-                    <label>URL Foto Profil</label>
-                    <input type="text" id="edit-avatar">
+
+                <!-- VIEW 3: PROFILE SETTINGS -->
+                <div id="view-profile" class="view-section hidden">
+                    <div class="section-header-flex">
+                        <div>
+                            <h3 class="section-title">Pengaturan Akun & Profil</h3>
+                            <div class="section-subtitle">Kelola identitas personal dan kredensial akses eksekutif Anda</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-grid">
+                        <div class="avatar-preview-box">
+                            <img src="" id="profile-display-avatar" class="avatar-lg" alt="Avatar">
+                            <div>
+                                <h4 id="profile-display-name" style="font-size: 0.95rem; font-weight: 600;">-</h4>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;" id="profile-display-email">-</p>
+                            </div>
+                        </div>
+
+                        <div class="card-panel">
+                            <form onsubmit="handleProfileUpdate(event)">
+                                <div class="form-group">
+                                    <label>Nama Lengkap</label>
+                                    <input type="text" id="input-edit-name" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>URL Avatar Foto</label>
+                                    <input type="text" id="input-edit-avatar" class="form-control" placeholder="https://...">
+                                </div>
+                                <div class="form-group">
+                                    <label>Jabatan / Title</label>
+                                    <input type="text" id="input-edit-title" class="form-control" placeholder="Contoh: Lead Systems Architect">
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="margin-top: 8px;">Simpan Perubahan Profil</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="field">
-                    <label>Bio Singkat</label>
-                    <textarea id="edit-bio" rows="3"></textarea>
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button type="button" class="btn-secondary" style="flex:1" onclick="toggleModal(false)">Batal</button>
-                    <button type="submit" class="btn-primary" style="flex:1; margin:0;">Simpan</button>
-                </div>
-            </form>
-        </div>
+            </div>
+        </main>
     </div>
 
     <script>
-        const STORAGE_USERS = 'portal_users_db';
-        const STORAGE_SESSION = 'portal_session_db';
-        let authMode = 'login';
+        const STORAGE_USERS = 'kenzo_enterprise_users';
+        const STORAGE_SESSION = 'kenzo_enterprise_session';
+        const STORAGE_LOGS = 'kenzo_enterprise_logs';
 
-        function notify(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+        let authMode = 'login'; // 'login' | 'signup'
+
+        // Toast System
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<div class="toast-dot"></div><span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 50);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 250);
+            }, 3000);
         }
 
-        function setAuthMode(mode) {
+        // Switch Auth Mode Tabs
+        function switchAuthMode(mode) {
             authMode = mode;
-            document.getElementById('btn-tab-login').classList.toggle('active', mode === 'login');
-            document.getElementById('btn-tab-signup').classList.toggle('active', mode === 'signup');
-            document.getElementById('field-name').classList.toggle('hidden', mode === 'login');
-            document.getElementById('btn-auth-submit').textContent = mode === 'login' ? 'Masuk' : 'Daftar Akun';
+            document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+            document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+            document.getElementById('group-fullname').classList.toggle('hidden', mode === 'login');
+            document.getElementById('btn-submit-text').textContent = mode === 'login' ? 'Masuk ke Dashboard' : 'Daftar Akun Baru';
         }
 
-        function toggleModal(show) {
-            document.getElementById('profile-modal').classList.toggle('hidden', !show);
+        // Add System Log
+        function logActivity(actionDesc) {
+            let logs = JSON.parse(localStorage.getItem(STORAGE_LOGS) || '[]');
+            logs.unshift({ desc: actionDesc, time: new Date().toLocaleTimeString('id-ID') + ' WIB' });
+            if (logs.length > 5) logs.pop();
+            localStorage.setItem(STORAGE_LOGS, JSON.stringify(logs));
         }
 
-        function handleAuth(e) {
+        // Load Demo Fast
+        function loadDemoAccount() {
+            document.getElementById('input-email').value = 'kenzo@admin.io';
+            document.getElementById('input-password').value = 'admin123';
+            switchAuthMode('login');
+            showToast('Kredensial demo diisi otomatis!', 'info');
+        }
+
+        // Auth Form Submission Handler
+        function handleAuthSubmit(e) {
             e.preventDefault();
             const email = document.getElementById('input-email').value.trim();
             const password = document.getElementById('input-password').value.trim();
-            const name = document.getElementById('input-name').value.trim();
+            const fullname = document.getElementById('input-fullname').value.trim();
 
             let users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
 
             if (authMode === 'signup') {
-                if (users.some(u => u.email === email)) return notify('Email sudah terdaftar!');
+                if (users.some(u => u.email === email)) {
+                    return showToast('Email sudah terdaftar di sistem!', 'error');
+                }
                 const newUser = {
                     email, password,
-                    name: name || 'Kenzo',
-                    title: 'Tech Architect & CEO Aspirant',
-                    bio: 'Mengelola arsitektur server, otomatisasi sistem, dan pengembangan ekosistem digital performa tinggi.',
-                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Kenzo')}&background=161920&color=f3f4f6`
+                    name: fullname || 'Kenzo Developer',
+                    title: 'Senior Infrastructure Engineer',
+                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullname || email)}&background=171b24&color=f3f4f6&bold=true`
                 };
                 users.push(newUser);
                 localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
                 localStorage.setItem(STORAGE_SESSION, JSON.stringify(newUser));
-                notify('Akun berhasil dibuat!');
+                logActivity('Akun baru berhasil didaftarkan');
+                showToast('Pendaftaran akun berhasil!', 'success');
             } else {
                 const user = users.find(u => u.email === email && u.password === password);
-                if (!user) return notify('Email atau password salah!');
+                if (!user) {
+                    return showToast('Email atau password salah!', 'error');
+                }
                 localStorage.setItem(STORAGE_SESSION, JSON.stringify(user));
-                notify('Selamat datang kembali!');
+                logActivity('Sesi login baru diinisialisasi');
+                showToast('Selamat datang kembali, ' + user.name + '!', 'success');
             }
-            render();
+            renderApp();
         }
 
-        function handleLogout() {
-            localStorage.removeItem(STORAGE_SESSION);
-            notify('Berhasil keluar');
-            render();
-        }
-
-        function handleSaveProfile(e) {
+        // Profile Update Handler
+        function handleProfileUpdate(e) {
             e.preventDefault();
             let session = JSON.parse(localStorage.getItem(STORAGE_SESSION));
             let users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
 
-            session.name = document.getElementById('edit-name').value;
-            session.title = document.getElementById('edit-title').value;
-            session.avatar = document.getElementById('edit-avatar').value || `https://ui-avatars.com/api/?name=${encodeURIComponent(session.name)}&background=161920&color=f3f4f6`;
-            session.bio = document.getElementById('edit-bio').value;
+            session.name = document.getElementById('input-edit-name').value.trim();
+            session.title = document.getElementById('input-edit-title').value.trim();
+            let customAvatar = document.getElementById('input-edit-avatar').value.trim();
+            if(customAvatar) session.avatar = customAvatar;
 
-            // Sync Database & Session
             const idx = users.findIndex(u => u.email === session.email);
             if (idx !== -1) users[idx] = session;
 
             localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
             localStorage.setItem(STORAGE_SESSION, JSON.stringify(session));
-
-            toggleModal(false);
-            notify('Profil berhasil diperbarui');
-            render();
+            logActivity('Profil diperbarui oleh pengguna');
+            showToast('Profil berhasil diperbarui!', 'success');
+            renderApp();
         }
 
-        function render() {
+        // Logout
+        function handleLogout() {
+            logActivity('Sesi diakhiri (Logout)');
+            localStorage.removeItem(STORAGE_SESSION);
+            showToast('Anda telah keluar dari sistem.', 'info');
+            renderApp();
+        }
+
+        // Navigation View Router
+        function switchView(viewName, el) {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            if(el) el.classList.add('active');
+
+            const titles = {
+                overview: 'Overview Dashboard',
+                projects: 'Infrastruktur & Proyek Sistem',
+                profile: 'Pengaturan Profil Akun'
+            };
+            document.getElementById('topbar-title').textContent = titles[viewName] || 'Dashboard';
+        }
+
+        // Render Dynamic UI Elements
+        function renderApp() {
             const session = JSON.parse(localStorage.getItem(STORAGE_SESSION));
-            document.getElementById('auth-view').classList.toggle('hidden', !!session);
-            document.getElementById('dashboard-view').classList.toggle('hidden', !session);
+            const authWrapper = document.getElementById('auth-wrapper');
+            const appWrapper = document.getElementById('app-wrapper');
 
             if (session) {
-                document.getElementById('nav-avatar').src = session.avatar;
-                document.getElementById('user-avatar').src = session.avatar;
-                document.getElementById('user-name').textContent = session.name;
-                document.getElementById('user-title').textContent = session.title;
-                document.getElementById('user-bio').textContent = session.bio;
+                authWrapper.classList.add('hidden');
+                appWrapper.classList.remove('hidden');
 
-                // Populate form modal
-                document.getElementById('edit-name').value = session.name;
-                document.getElementById('edit-title').value = session.title;
-                document.getElementById('edit-avatar').value = session.avatar;
-                document.getElementById('edit-bio').value = session.bio;
+                // Sidebar Info
+                document.getElementById('sidebar-name').textContent = session.name;
+                document.getElementById('sidebar-email').textContent = session.email;
+                document.getElementById('sidebar-avatar').src = session.avatar;
+
+                // Profile Page Form Info
+                document.getElementById('profile-display-name').textContent = session.name;
+                document.getElementById('profile-display-email').textContent = session.email;
+                document.getElementById('profile-display-avatar').src = session.avatar;
+
+                document.getElementById('input-edit-name').value = session.name;
+                document.getElementById('input-edit-title').value = session.title || '';
+                document.getElementById('input-edit-avatar').value = session.avatar || '';
+
+                // Render Logs
+                const logs = JSON.parse(localStorage.getItem(STORAGE_LOGS) || '[]');
+                const logContainer = document.getElementById('activity-log-container');
+                if (logs.length === 0) {
+                    logContainer.innerHTML = '<div style="font-size:0.825rem; color:var(--text-dim);">Belum ada aktivitas tercatat.</div>';
+                } else {
+                    logContainer.innerHTML = logs.map(l => `
+                        <div class="activity-item">
+                            <span class="activity-desc">${l.desc}</span>
+                            <span class="activity-time">${l.time}</span>
+                        </div>
+                    `).join('');
+                }
+            } else {
+                appWrapper.classList.add('hidden');
+                authWrapper.classList.remove('hidden');
             }
         }
 
-        // Default Admin User on First Launch
-        (function init() {
-            const users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
+        // System Initialization on Load
+        (function initSystem() {
+            let users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
             if (users.length === 0) {
                 users.push({
-                    email: 'kenzo@admin.com',
-                    password: 'admin',
+                    email: 'kenzo@admin.io',
+                    password: 'admin123',
                     name: 'Kenzo',
-                    title: 'Tech Architect & CEO Aspirant',
-                    bio: 'Mengelola arsitektur server, otomatisasi sistem, dan pengembangan ekosistem digital performa tinggi.',
-                    avatar: 'https://ui-avatars.com/api/?name=Kenzo&background=161920&color=f3f4f6'
+                    title: 'Lead Cloud Architect',
+                    avatar: 'https://ui-avatars.com/api/?name=Kenzo&background=171b24&color=f3f4f6&bold=true'
                 });
                 localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
+                localStorage.setItem(STORAGE_LOGS, JSON.stringify([{ desc: 'Sistem diinisialisasi untuk pertama kali', time: new Date().toLocaleTimeString('id-ID') + ' WIB' }]));
             }
-            render();
+            renderApp();
         })();
     </script>
 </body>

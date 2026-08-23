@@ -1,406 +1,830 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IQC (iPhone Quote Chat) Generator</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            margin: 0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iPhone Quote Chat (IQC) Studio Pro</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        .container {
-            background-color: #1e1e1e;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            max-width: 600px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+  <style>
+    :root {
+      --bg-body: #000000;
+      --bg-surface: #1c1c1e;
+      --bg-input: #2c2c2e;
+      --border: #3a3a3c;
+      --border-subtle: #2c2c2e;
+      
+      --text-main: #ffffff;
+      --text-muted: #8e8e93;
+      --text-dim: #636366;
+      
+      --ios-blue: #0a84ff;
+      --ios-blue-hover: #0071e3;
+      --ios-green: #30d158;
+      --ios-red: #ff453a;
+      
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
 
-        h1 {
-            margin: 0;
-            color: #4da6ff;
-            text-align: center;
-            font-size: 24px;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', "SF Pro Text", "SF Pro Display", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
 
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: 100%;
-        }
+    body {
+      min-height: 100vh;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
 
-        label {
-            font-weight: bold;
-            font-size: 14px;
-            color: #aaa;
-        }
+    /* Header Studio */
+    .app-header {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
 
-        textarea, input[type="text"] {
-            padding: 12px;
-            width: 100%;
-            border-radius: 8px;
-            border: 1px solid #444;
-            background-color: #2a2a2a;
-            color: white;
-            font-size: 16px;
-            font-family: inherit;
-        }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        
-        input[type="file"] {
-            padding: 10px;
-            background-color: #2a2a2a;
-            border-radius: 8px;
-            border: 1px solid #444;
-            color: white;
-        }
+    .brand-badge {
+      background: linear-gradient(135deg, #0a84ff, #5e5ce6);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
 
-        input[type="range"] {
-            width: 100%;
-            margin-top: 5px;
-        }
+    .brand-title h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
 
-        .row {
-            display: flex;
-            gap: 15px;
-        }
-        .row > div {
-            flex: 1;
-        }
+    /* Layout 2 Kolom Studio */
+    .studio-container {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
 
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            background: #2a2a2a;
-            padding: 10px;
-            border-radius: 8px;
-        }
+    /* Control Panel (Kiri) */
+    .controls-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
-        button {
-            background-color: #4da6ff;
-            color: #121212;
-            border: none;
-            padding: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s;
-            margin-top: 10px;
-        }
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
 
-        button:hover {
-            background-color: #3b82cc;
-        }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
-        .preview-container {
-            width: 100%;
-            border: 1px solid #444;
-            border-radius: 12px;
-            overflow: hidden;
-            background-color: #000;
-        }
+    textarea, input[type="text"] {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
 
-        canvas {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-    </style>
+    textarea {
+      resize: vertical;
+      min-height: 95px;
+      line-height: 1.4;
+    }
+
+    textarea:focus, input[type="text"]:focus {
+      border-color: var(--ios-blue);
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* iOS Style File Input & Sliders */
+    .file-input-wrapper {
+      position: relative;
+      background: var(--bg-input);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .file-input-wrapper:hover {
+      background: #3a3a3c;
+    }
+
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-label {
+      font-size: 0.82rem;
+      color: var(--ios-blue);
+      font-weight: 600;
+    }
+
+    .slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--ios-blue);
+      cursor: pointer;
+    }
+
+    /* iOS Custom Toggle Switch */
+    .toggle-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-input);
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .toggle-item span {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    .ios-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .ios-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #3a3a3c;
+      transition: .25s;
+      border-radius: 24px;
+    }
+
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .25s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    input:checked + .switch-slider {
+      background-color: var(--ios-green);
+    }
+
+    input:checked + .switch-slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Color Palette Picker */
+    .bubble-color-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .color-opt-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      padding: 8px;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .color-opt-btn.active {
+      border-color: var(--ios-blue);
+      color: var(--text-main);
+      background: #3a3a3c;
+    }
+
+    /* Button Primary */
+    .btn-download {
+      background: var(--ios-blue);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-download:hover {
+      background: var(--ios-blue-hover);
+    }
+
+    .btn-download:active {
+      transform: scale(0.99);
+    }
+
+    /* Preview Panel (Kanan) */
+    .preview-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 560px;
+      position: sticky;
+      top: 24px;
+    }
+
+    .device-mockup {
+      width: 100%;
+      max-width: 360px;
+      border-radius: 36px;
+      overflow: hidden;
+      border: 4px solid #2c2c2e;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      background: #000;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    @media (max-width: 860px) {
+      .studio-container {
+        grid-template-columns: 1fr;
+      }
+      .preview-panel {
+        position: static;
+        min-height: auto;
+      }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>IQC Chat Generator</h1>
-        
-        <div class="input-group">
-            <label for="quoteText">Teks Kutipan / Pesan:</label>
-            <textarea id="quoteText">"Jika hari ini belum berhasil, bukan berarti impianmu telah berakhir. kegagalan itu sebuah pelajaran bukan berakhirnya sebuah harapan"</textarea>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand-title">
+      <span class="brand-badge">iOS 18</span>
+      <h1>IQC Chat Studio Pro</h1>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="studio-container">
+    
+    <!-- Left Controls Panel -->
+    <div class="controls-panel">
+      
+      <!-- Text Quote -->
+      <div class="control-group">
+        <div class="section-label">Pesan / Kutipan</div>
+        <textarea id="quoteText" placeholder="Ketik pesan...">"Jika hari ini belum berhasil, bukan berarti impianmu telah berakhir. Kegagalan itu sebuah pelajaran, bukan berakhirnya sebuah harapan."</textarea>
+      </div>
+
+      <!-- Status Bar Spec -->
+      <div class="control-group">
+        <div class="section-label">Informasi Status Bar</div>
+        <div class="row-2">
+          <input type="text" id="timeText" value="09:41" placeholder="Waktu (09:41)">
+          <input type="text" id="providerText" value="Indosat LTE" placeholder="Provider">
+        </div>
+        <div class="slider-row" style="margin-top: 4px;">
+          <div class="slider-header">
+            <span>Level Baterai</span>
+            <span id="batteryVal">85%</span>
+          </div>
+          <input type="range" id="batteryLevel" min="5" max="100" value="85">
+        </div>
+      </div>
+
+      <!-- Bubble Color Theme -->
+      <div class="control-group">
+        <div class="section-label">Gaya Bubble Chat</div>
+        <div class="bubble-color-selector">
+          <button class="color-opt-btn active" id="btnDarkTheme" onclick="setBubbleTheme('dark')">Dark Gray</button>
+          <button class="color-opt-btn" id="btnBlueTheme" onclick="setBubbleTheme('blue')">iMessage</button>
+          <button class="color-opt-btn" id="btnGreenTheme" onclick="setBubbleTheme('green')">SMS Green</button>
+        </div>
+      </div>
+
+      <!-- Background & Effects -->
+      <div class="control-group">
+        <div class="section-label">Latar Belakang & Efek</div>
+        <div class="file-input-wrapper">
+          <span class="file-label" id="fileStatusLabel">+ Upload Gambar Background</span>
+          <input type="file" id="bgUpload" accept="image/*">
         </div>
 
-        <div class="row">
-            <div class="input-group">
-                <label for="timeText">Waktu (Jam):</label>
-                <input type="text" id="timeText" value="05:54">
-            </div>
-            <div class="input-group">
-                <label for="providerText">Nama Provider:</label>
-                <input type="text" id="providerText" value="INDOSAT LTE">
-            </div>
+        <div class="slider-row">
+          <div class="slider-header">
+            <span>Tingkat Blur</span>
+            <span id="blurVal">12px</span>
+          </div>
+          <input type="range" id="blurAmount" min="0" max="30" value="12">
         </div>
 
-        <div class="input-group">
-            <label for="bgUpload">Upload Background (Opsional):</label>
-            <input type="file" id="bgUpload" accept="image/*">
+        <div class="slider-row">
+          <div class="slider-header">
+            <span>Kegelapan Overlay (Dim)</span>
+            <span id="dimVal">40%</span>
+          </div>
+          <input type="range" id="dimAmount" min="0" max="80" value="40">
+        </div>
+      </div>
+
+      <!-- Element Toggles -->
+      <div class="control-group">
+        <div class="section-label">Elemen iOS</div>
+
+        <div class="toggle-item">
+          <span>Tampilkan Dynamic Island</span>
+          <label class="ios-switch">
+            <input type="checkbox" id="showDynamicIsland" checked>
+            <span class="switch-slider"></span>
+          </label>
         </div>
 
-        <div class="input-group">
-            <label for="blurAmount">Tingkat Blur Background:</label>
-            <input type="range" id="blurAmount" min="0" max="30" value="10">
-        </div>
-
-        <label class="checkbox-group">
+        <div class="toggle-item">
+          <span>Baris Reaksi Emoji</span>
+          <label class="ios-switch">
             <input type="checkbox" id="showReactions" checked>
-            Tampilkan Baris Reaksi (👍 ❤️ 😂 😮 😢 🙏)
-        </label>
-
-        <label class="checkbox-group">
-            <input type="checkbox" id="showMenu" checked>
-            Tampilkan Menu Opsi (Balas, Salin, Hapus, dll)
-        </label>
-
-        <button id="downloadBtn">Unduh Gambar (Resolusi Tinggi)</button>
-
-        <div class="preview-container">
-            <canvas id="iqcCanvas" width="1080" height="1920"></canvas>
+            <span class="switch-slider"></span>
+          </label>
         </div>
+
+        <div class="toggle-item">
+          <span>Context Menu iOS</span>
+          <label class="ios-switch">
+            <input type="checkbox" id="showMenu" checked>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <button class="btn-download" id="downloadBtn">
+        Unduh Gambar High-Res (1080x1920)
+      </button>
+
     </div>
 
-    <script>
-        const canvas = document.getElementById('iqcCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        const quoteText = document.getElementById('quoteText');
-        const timeText = document.getElementById('timeText');
-        const providerText = document.getElementById('providerText');
-        const showReactions = document.getElementById('showReactions');
-        const showMenu = document.getElementById('showMenu');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const bgUpload = document.getElementById('bgUpload');
-        const blurAmount = document.getElementById('blurAmount');
+    <!-- Right Preview Panel -->
+    <div class="preview-panel">
+      <div class="device-mockup">
+        <canvas id="iqcCanvas" width="1080" height="1920"></canvas>
+      </div>
+    </div>
 
-        let bgImage = null;
+  </main>
 
-        bgUpload.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const img = new Image();
-                    img.onload = function() {
-                        bgImage = img;
-                        draw();
-                    }
-                    img.src = event.target.result;
-                }
-                reader.readAsDataURL(file);
-            }
-        });
+  <script>
+    const canvas = document.getElementById('iqcCanvas');
+    const ctx = canvas.getContext('2d');
 
-        function roundRect(ctx, x, y, width, height, radius) {
+    // Inputs
+    const quoteText = document.getElementById('quoteText');
+    const timeText = document.getElementById('timeText');
+    const providerText = document.getElementById('providerText');
+    const batteryLevel = document.getElementById('batteryLevel');
+    const batteryVal = document.getElementById('batteryVal');
+
+    const blurAmount = document.getElementById('blurAmount');
+    const blurVal = document.getElementById('blurVal');
+    const dimAmount = document.getElementById('dimAmount');
+    const dimVal = document.getElementById('dimVal');
+
+    const showDynamicIsland = document.getElementById('showDynamicIsland');
+    const showReactions = document.getElementById('showReactions');
+    const showMenu = document.getElementById('showMenu');
+    const bgUpload = document.getElementById('bgUpload');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    let bgImage = null;
+    let currentBubbleTheme = 'dark'; // 'dark' | 'blue' | 'green'
+
+    // Background Upload
+    bgUpload.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('fileStatusLabel').textContent = `Gambar: ${file.name.substring(0, 15)}...`;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const img = new Image();
+          img.onload = function() {
+            bgImage = img;
+            draw();
+          }
+          img.src = event.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function setBubbleTheme(theme) {
+      currentBubbleTheme = theme;
+      document.querySelectorAll('.color-opt-btn').forEach(b => b.classList.remove('active'));
+      if (theme === 'dark') document.getElementById('btnDarkTheme').classList.add('active');
+      if (theme === 'blue') document.getElementById('btnBlueTheme').classList.add('active');
+      if (theme === 'green') document.getElementById('btnGreenTheme').classList.add('active');
+      draw();
+    }
+
+    // Helper Rounded Rectangle
+    function roundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    // Helper Text Wrapper
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      let currentY = y;
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line, x, currentY);
+          line = words[n] + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, currentY);
+    }
+
+    // Vector Drawing: Authentic iOS Status Bar Icons
+    function drawIOSStatusBar(time, provider, batteryPct, hasIsland) {
+      const startY = 70;
+
+      // 1. Time (Left Side)
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '700 42px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(time, 90, startY);
+
+      // 2. Dynamic Island (Center Top)
+      if (hasIsland) {
+        ctx.fillStyle = '#000000';
+        roundRect(ctx, (canvas.width / 2) - 130, 35, 260, 70, 35);
+        ctx.fill();
+      }
+
+      // Right Icons Container (Signal, Provider/Wifi, Battery)
+      const rightX = canvas.width - 90;
+
+      // 3. Battery Vector (Far Right)
+      const batW = 52;
+      const batH = 26;
+      const batX = rightX - batW;
+      const batY = startY - (batH / 2);
+
+      // Battery Body Frame
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = 3;
+      roundRect(ctx, batX, batY, batW, batH, 7);
+      ctx.stroke();
+
+      // Battery Pin/Tip
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      roundRect(ctx, batX + batW + 2, batY + 8, 3, 10, 2);
+      ctx.fill();
+
+      // Battery Fill Level
+      const fillMargin = 3;
+      const maxFillW = batW - (fillMargin * 2);
+      const actualFillW = Math.max(0, (batteryPct / 100) * maxFillW);
+
+      ctx.fillStyle = batteryPct <= 20 ? '#ff453a' : '#ffffff';
+      roundRect(ctx, batX + fillMargin, batY + fillMargin, actualFillW, batH - (fillMargin * 2), 4);
+      ctx.fill();
+
+      // 4. Cellular Signal Bars Vector
+      const sigX = batX - 75;
+      const barWidth = 6;
+      const gap = 4;
+      for (let i = 0; i < 4; i++) {
+        const barH = 10 + (i * 5);
+        const bx = sigX + (i * (barWidth + gap));
+        const by = startY + 10 - barH;
+        ctx.fillStyle = i < 3 ? '#ffffff' : 'rgba(255, 255, 255, 0.3)'; // 3 of 4 bars filled
+        roundRect(ctx, bx, by, barWidth, barH, 2);
+        ctx.fill();
+      }
+
+      // 5. Provider / LTE Text
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '600 30px -apple-system, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(provider, sigX - 20, startY);
+    }
+
+    // Main Canvas Render Engine
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 1. Background Render
+      if (bgImage) {
+        ctx.filter = `blur(${blurAmount.value}px)`;
+        const scale = Math.max(canvas.width / bgImage.width, canvas.height / bgImage.height);
+        const x = (canvas.width / 2) - (bgImage.width / 2) * scale;
+        const y = (canvas.height / 2) - (bgImage.height / 2) * scale;
+        ctx.drawImage(bgImage, x, y, bgImage.width * scale, bgImage.height * scale);
+        ctx.filter = 'none';
+
+        // Dark Overlay Dimming
+        const dimOpacity = dimAmount.value / 100;
+        ctx.fillStyle = `rgba(0, 0, 0, ${dimOpacity})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      } else {
+        // High-end Dark Gradient Fallback
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, '#151c24');
+        grad.addColorStop(1, '#080a0e');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // 2. iOS Status Bar
+      drawIOSStatusBar(timeText.value, providerText.value, parseInt(batteryLevel.value), showDynamicIsland.checked);
+
+      let currentY = 270;
+      const startX = 75;
+
+      // 3. Reactions Capsule Bar (iOS Floating Bar)
+      if (showReactions.checked) {
+        const reactW = 680;
+        const reactH = 100;
+
+        // Glassmorphism Capsule BG
+        ctx.fillStyle = 'rgba(38, 38, 42, 0.95)';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        ctx.shadowBlur = 30;
+        roundRect(ctx, startX, currentY, reactW, reactH, 50);
+        ctx.fill();
+        ctx.shadowBlur = 0; // reset shadow
+
+        // Border Subtle
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Emojis Render
+        ctx.font = '54px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const emojis = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
+        let emojiX = startX + 65;
+        for (let e of emojis) {
+          ctx.fillText(e, emojiX, currentY + (reactH / 2));
+          emojiX += 110;
+        }
+
+        currentY += reactH + 24;
+      }
+
+      // 4. Message Bubble
+      const chatWidth = 860;
+      ctx.font = '400 42px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif';
+      
+      const lineHeight = 58;
+      const textPadding = 48;
+      const maxTextWidth = chatWidth - (textPadding * 2);
+
+      // Measure height dynamically
+      const words = quoteText.value.split(' ');
+      let lineCount = 1;
+      let tempLine = '';
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = tempLine + words[n] + ' ';
+        if (ctx.measureText(testLine).width > maxTextWidth && n > 0) {
+          tempLine = words[n] + ' ';
+          lineCount++;
+        } else {
+          tempLine = testLine;
+        }
+      }
+
+      const totalTextHeight = lineCount * lineHeight;
+      const chatHeight = totalTextHeight + (textPadding * 2) + 30;
+
+      // Bubble Color Theme
+      let bubbleBg = '#26262a';
+      if (currentBubbleTheme === 'blue') bubbleBg = '#0a84ff';
+      if (currentBubbleTheme === 'green') bubbleBg = '#30d158';
+
+      ctx.fillStyle = bubbleBg;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = 20;
+      roundRect(ctx, startX, currentY, chatWidth, chatHeight, 32);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Render Text Message
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      wrapText(ctx, quoteText.value, startX + textPadding, currentY + textPadding, maxTextWidth, lineHeight);
+
+      // Message Time Stamp (Bottom Right)
+      ctx.font = '400 24px -apple-system, sans-serif';
+      ctx.fillStyle = currentBubbleTheme === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 255, 255, 0.8)';
+      ctx.textAlign = 'right';
+      ctx.fillText(timeText.value, startX + chatWidth - 36, currentY + chatHeight - 40);
+
+      currentY += chatHeight + 24;
+
+      // 5. Context Menu (iOS Long Press Card)
+      if (showMenu.checked) {
+        const menuW = 540;
+        const menuItems = [
+          { label: 'Beri Bintang', icon: '★' },
+          { label: 'Balas', icon: '↩' },
+          { label: 'Teruskan', icon: '↪' },
+          { label: 'Salin', icon: '📄' },
+          { label: 'Laporkan', icon: '⚠' },
+          { label: 'Hapus', icon: '🗑', isRed: true }
+        ];
+
+        const itemH = 82;
+        const menuH = menuItems.length * itemH;
+
+        // Card BG
+        ctx.fillStyle = 'rgba(44, 44, 46, 0.94)';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        ctx.shadowBlur = 35;
+        roundRect(ctx, startX, currentY, menuW, menuH, 28);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.textBaseline = 'middle';
+
+        for (let i = 0; i < menuItems.length; i++) {
+          const item = menuItems[i];
+          const itemY = currentY + (i * itemH) + (itemH / 2);
+
+          // Divider Lines
+          if (i > 0) {
             ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + width - radius, y);
-            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-            ctx.lineTo(x + width, y + height - radius);
-            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-            ctx.lineTo(x + radius, y + height);
-            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
-            ctx.closePath();
-            ctx.fill();
+            ctx.moveTo(startX, currentY + (i * itemH));
+            ctx.lineTo(startX + menuW, currentY + (i * itemH));
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          }
+
+          // Item Label Text
+          ctx.font = '500 34px -apple-system, sans-serif';
+          ctx.fillStyle = item.isRed ? '#ff453a' : '#ffffff';
+          ctx.textAlign = 'left';
+          ctx.fillText(item.label, startX + 36, itemY);
+
+          // Item Icon
+          ctx.font = '34px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
+          ctx.textAlign = 'right';
+          ctx.fillText(item.icon, startX + menuW - 36, itemY);
         }
+      }
+    }
 
-        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-            const words = text.split(' ');
-            let line = '';
-            let currentY = y;
-            let linesRendered = 0;
+    // Event Listeners for Live Updates
+    quoteText.addEventListener('input', draw);
+    timeText.addEventListener('input', draw);
+    providerText.addEventListener('input', draw);
 
-            for (let n = 0; n < words.length; n++) {
-                const testLine = line + words[n] + ' ';
-                const metrics = ctx.measureText(testLine);
-                const testWidth = metrics.width;
-                if (testWidth > maxWidth && n > 0) {
-                    ctx.fillText(line, x, currentY);
-                    line = words[n] + ' ';
-                    currentY += lineHeight;
-                    linesRendered++;
-                } else {
-                    line = testLine;
-                }
-            }
-            ctx.fillText(line, x, currentY);
-            linesRendered++;
-            return linesRendered * lineHeight;
-        }
+    batteryLevel.addEventListener('input', () => {
+      batteryVal.textContent = `${batteryLevel.value}%`;
+      draw();
+    });
 
-        function draw() {
-            // 1. Latar Belakang Dasar
-            if (bgImage) {
-                // Efek Blur pada Gambar
-                ctx.filter = `blur(${blurAmount.value}px)`;
-                
-                // Kalkulasi aspect ratio agar pas (cover)
-                const scale = Math.max(canvas.width / bgImage.width, canvas.height / bgImage.height);
-                const x = (canvas.width / 2) - (bgImage.width / 2) * scale;
-                const y = (canvas.height / 2) - (bgImage.height / 2) * scale;
-                
-                ctx.drawImage(bgImage, x, y, bgImage.width * scale, bgImage.height * scale);
-                
-                // Reset filter agar elemen lain tidak ikut blur
-                ctx.filter = 'none';
-                
-                // Tambahkan overlay gelap transparan
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            } else {
-                ctx.fillStyle = '#0a0a0c';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-                gradient.addColorStop(0, '#10141a');
-                gradient.addColorStop(1, '#05070a');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
+    blurAmount.addEventListener('input', () => {
+      blurVal.textContent = `${blurAmount.value}px`;
+      draw();
+    });
 
-            // 2. Status Bar (Atas)
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 36px -apple-system, sans-serif';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(`ıll ${providerText.value}`, 60, 60);
-            ctx.textAlign = 'center';
-            ctx.fillText(timeText.value, canvas.width / 2, 60);
-            ctx.textAlign = 'right';
-            ctx.fillText('66% 🔋', canvas.width - 60, 60);
+    dimAmount.addEventListener('input', () => {
+      dimVal.textContent = `${dimAmount.value}%`;
+      draw();
+    });
 
-            let currentY = 300; 
-            const startX = 60;  
+    showDynamicIsland.addEventListener('change', draw);
+    showReactions.addEventListener('change', draw);
+    showMenu.addEventListener('change', draw);
 
-            // 3. Baris Reaksi
-            if (showReactions.checked) {
-                ctx.fillStyle = '#262628';
-                roundRect(ctx, startX, currentY, 700, 110, 55);
-                ctx.font = '65px sans-serif';
-                ctx.textAlign = 'left';
-                const emojis = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
-                let emojiX = startX + 50;
-                for (let e of emojis) {
-                    ctx.fillText(e, emojiX, currentY + 55);
-                    emojiX += 105;
-                }
-                currentY += 130; 
-            }
+    // High-Res Download Handler
+    downloadBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = `IQC_Quote_iOS18_${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      link.click();
+    });
 
-            // 4. Kotak Chat
-            const chatWidth = 850;
-            ctx.font = '45px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-            
-            const lineHeight = 60;
-            const textPadding = 50;
-            const maxWidth = chatWidth - (textPadding * 2);
-            
-            let tempLine = '';
-            let lineCount = 1;
-            const words = quoteText.value.split(' ');
-            for (let n = 0; n < words.length; n++) {
-                const testLine = tempLine + words[n] + ' ';
-                if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-                    tempLine = words[n] + ' ';
-                    lineCount++;
-                } else {
-                    tempLine = testLine;
-                }
-            }
-            const totalTextHeight = lineCount * lineHeight;
-            const chatHeight = totalTextHeight + (textPadding * 2) + 40;
-
-            ctx.fillStyle = '#262628';
-            roundRect(ctx, startX, currentY, chatWidth, chatHeight, 25);
-            
-            ctx.fillStyle = '#ffffff';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-            wrapText(ctx, quoteText.value, startX + textPadding, currentY + textPadding, maxWidth, lineHeight);
-
-            ctx.font = '28px -apple-system, sans-serif';
-            ctx.fillStyle = '#999999';
-            ctx.textAlign = 'right';
-            ctx.fillText(timeText.value, startX + chatWidth - 30, currentY + chatHeight - 45);
-
-            currentY += chatHeight + 20;
-
-            // 5. Menu Konteks
-            if (showMenu.checked) {
-                const menuWidth = 600;
-                const menuItems = [
-                    { text: 'Beri Bintang', icon: '☆' },
-                    { text: 'Balas', icon: '↩' },
-                    { text: 'Teruskan', icon: '↪' },
-                    { text: 'Salin', icon: '📄' },
-                    { text: 'Ucapkan', icon: '💬' },
-                    { text: 'Laporkan', icon: '⚠' },
-                    { text: 'Hapus', icon: '🗑', isRed: true }
-                ];
-                
-                const itemHeight = 90;
-                const menuHeight = menuItems.length * itemHeight;
-
-                ctx.fillStyle = 'rgba(40, 40, 45, 0.9)'; 
-                roundRect(ctx, startX, currentY, menuWidth, menuHeight, 30);
-                ctx.textBaseline = 'middle';
-                
-                for (let i = 0; i < menuItems.length; i++) {
-                    const item = menuItems[i];
-                    const itemY = currentY + (i * itemHeight) + (itemHeight / 2);
-
-                    if (i > 0) {
-                        ctx.beginPath();
-                        ctx.moveTo(startX, currentY + (i * itemHeight));
-                        ctx.lineTo(startX + menuWidth, currentY + (i * itemHeight));
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-                        ctx.lineWidth = 2;
-                        ctx.stroke();
-                    }
-
-                    ctx.font = '38px -apple-system, sans-serif';
-                    ctx.fillStyle = item.isRed ? '#ff453a' : '#ffffff';
-                    ctx.textAlign = 'left';
-                    ctx.fillText(item.text, startX + 40, itemY);
-
-                    ctx.textAlign = 'right';
-                    ctx.font = '38px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
-                    ctx.fillText(item.icon, startX + menuWidth - 40, itemY);
-                }
-            }
-        }
-
-        quoteText.addEventListener('input', draw);
-        timeText.addEventListener('input', draw);
-        providerText.addEventListener('input', draw);
-        showReactions.addEventListener('change', draw);
-        showMenu.addEventListener('change', draw);
-        blurAmount.addEventListener('input', draw);
-
-        downloadBtn.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.download = `IQC_Quote_${Date.now()}.png`;
-            link.href = canvas.toDataURL('image/png', 1.0);
-            link.click();
-        });
-
-        setTimeout(draw, 100);
-    </script>
+    // Initial Render
+    draw();
+  </script>
 </body>
 </html>

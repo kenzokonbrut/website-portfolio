@@ -3,32 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kalkulator Usia Presisi | KenzoVerse Tools</title>
+  <title>Kalkulator Usia Simple</title>
 
-  <!-- Typography -->
+  <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg-body: #0b0f19;
-      --bg-surface: rgba(21, 29, 42, 0.75);
-      --bg-input: rgba(9, 13, 22, 0.8);
-      --border: rgba(255, 255, 255, 0.1);
-      --border-focus: #38bdf8;
-      
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --input-bg: #0f172a;
+      --border: #334155;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --text-dim: #64748b;
-      
-      --accent: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.25);
-      --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
-      
-      --error: #ef4444;
-      --radius: 20px;
-      --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --error: #f43f5e;
     }
 
     * {
@@ -41,77 +34,34 @@
     body {
       min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      background-color: var(--bg-body);
+      justify-content: center;
+      background-color: var(--bg);
       color: var(--text-main);
       padding: 20px;
-      position: relative;
-      overflow-x: hidden;
     }
 
-    /* Background Ambient Glow */
-    body::before {
-      content: "";
-      position: absolute;
-      width: 350px;
-      height: 350px;
-      background: var(--accent-gradient);
-      top: 15%;
-      left: 50%;
-      transform: translateX(-50%);
-      filter: blur(120px);
-      opacity: 0.25;
-      border-radius: 50%;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .container {
-      position: relative;
-      z-index: 1;
+    .card {
       width: 100%;
-      max-width: 460px;
-      background: var(--bg-surface);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      max-width: 380px;
+      background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 32px;
-      box-shadow: var(--shadow);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
-    .header {
-      text-align: center;
-    }
-
-    .header-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
+    .card-header h1 {
+      font-size: 1.35rem;
       font-weight: 700;
-      color: var(--accent);
-      background: rgba(56, 189, 248, 0.1);
-      padding: 6px 12px;
-      border-radius: 99px;
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .header h2 {
-      font-size: 1.6rem;
-      font-weight: 800;
       letter-spacing: -0.02em;
     }
 
-    .header p {
-      font-size: 0.875rem;
+    .card-header p {
+      font-size: 0.85rem;
       color: var(--text-muted);
       margin-top: 4px;
     }
@@ -123,259 +73,157 @@
     }
 
     label {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 600;
       color: var(--text-muted);
-    }
-
-    .input-wrapper {
-      position: relative;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     input[type="date"] {
       width: 100%;
-      padding: 14px 16px;
+      padding: 12px 14px;
       font-size: 0.95rem;
-      font-weight: 600;
       color: var(--text-main);
-      background: var(--bg-input);
+      background: var(--input-bg);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 10px;
       outline: none;
-      transition: all 0.25s ease;
+      transition: all 0.2s ease;
       color-scheme: dark;
     }
 
     input[type="date"]:focus {
-      border-color: var(--border-focus);
+      border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-glow);
     }
 
-    .btn-calc {
+    button {
       width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      background: var(--accent-gradient);
-      color: #ffffff;
+      padding: 12px;
       font-size: 0.95rem;
-      font-weight: 700;
+      font-weight: 600;
+      color: #ffffff;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
       cursor: pointer;
-      box-shadow: 0 4px 16px var(--accent-glow);
-      transition: all 0.25s ease;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
+      transition: all 0.2s ease;
     }
 
-    .btn-calc:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35);
+    button:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
     }
 
-    .btn-calc:active {
+    button:active {
       transform: translateY(0);
     }
 
-    .error-msg {
+    .error-text {
       font-size: 0.8rem;
       color: var(--error);
       display: none;
       text-align: center;
-      animation: fadeIn 0.2s ease;
     }
 
-    /* Result Section */
-    .results-container {
+    /* Result Cards */
+    .result-grid {
       display: none;
-      flex-direction: column;
-      gap: 16px;
-      margin-top: 8px;
-      animation: fadeInUp 0.4s ease forwards;
-    }
-
-    .age-main-grid {
-      display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      gap: 8px;
+      animation: fadeIn 0.3s ease;
     }
 
-    .stat-card {
-      background: var(--bg-input);
+    .result-box {
+      background: var(--input-bg);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 10px;
+      border-radius: 10px;
+      padding: 12px 8px;
       text-align: center;
     }
 
-    .stat-value {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--accent);
-      line-height: 1.2;
-    }
-
-    .stat-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-top: 4px;
-      text-transform: uppercase;
-    }
-
-    .stats-list {
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.85rem;
-    }
-
-    .stat-row-label {
-      color: var(--text-muted);
-    }
-
-    .stat-row-value {
+    .result-number {
+      font-size: 1.25rem;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--accent);
     }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .result-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @media (max-width: 480px) {
-      .container { padding: 24px 20px; }
-      .stat-value { font-size: 1.2rem; }
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="header">
-      <div class="header-badge"><span>⏳</span> Utilities</div>
-      <h2>Kalkulator Usia</h2>
-      <p>Hitung detail usia presisi dan hari lahirmu</p>
+  <div class="card">
+    <div class="card-header">
+      <h1>Cek Usia</h1>
+      <p>Hitung detail usia presisi dari tanggal lahirmu.</p>
     </div>
 
     <div class="form-group">
-      <label for="birthday">Pilih Tanggal Lahir</label>
-      <div class="input-wrapper">
-        <input type="date" id="birthday" onkeydown="handleKeyPress(event)">
-      </div>
-      <div class="error-msg" id="errorMsg">Silakan pilih tanggal lahir yang valid</div>
+      <label for="birthdate">Tanggal Lahir</label>
+      <input type="date" id="birthdate">
+      <span class="error-text" id="errorMsg"></span>
     </div>
 
-    <button class="btn-calc" onclick="calculateAge()">
-      <span>Hitung Usia</span>
-      <span>&rarr;</span>
-    </button>
+    <button onclick="calculateAge()">Hitung Usia</button>
 
-    <!-- Results Display -->
-    <div class="results-container" id="resultsView">
-      <div class="age-main-grid">
-        <div class="stat-card">
-          <div class="stat-value" id="resYears">0</div>
-          <div class="stat-label">Tahun</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="resMonths">0</div>
-          <div class="stat-label">Bulan</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="resDays">0</div>
-          <div class="stat-label">Hari</div>
-        </div>
+    <div class="result-grid" id="resultGrid">
+      <div class="result-box">
+        <div class="result-number" id="years">0</div>
+        <div class="result-label">Tahun</div>
       </div>
-
-      <div class="stats-list">
-        <div class="stat-row">
-          <span class="stat-row-label">Hari Kelahiran</span>
-          <span class="stat-row-value" id="resDayName">-</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-row-label">Total Hari Hidup</span>
-          <span class="stat-row-value" id="resTotalDays">-</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-row-label">Ulang Tahun Berikutnya</span>
-          <span class="stat-row-value" id="resNextBday">-</span>
-        </div>
+      <div class="result-box">
+        <div class="result-number" id="months">0</div>
+        <div class="result-label">Bulan</div>
+      </div>
+      <div class="result-box">
+        <div class="result-number" id="days">0</div>
+        <div class="result-label">Hari</div>
       </div>
     </div>
   </div>
 
   <script>
-    // Web Audio API Synth for Interactive UI Sound
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    function playAudioFX() {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.frequency.setValueAtTime(520, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.06);
-    }
-
-    function handleKeyPress(e) {
-      if (e.key === 'Enter') {
-        calculateAge();
-      }
-    }
-
     function calculateAge() {
-      playAudioFX();
-      
-      const birthdayInput = document.getElementById("birthday");
-      const errorMsg = document.getElementById("errorMsg");
-      const resultsView = document.getElementById("resultsView");
-      
-      if (!birthdayInput.value) {
-        showError("Silakan pilih tanggal lahir Anda");
+      const input = document.getElementById('birthdate').value;
+      const errorEl = document.getElementById('errorMsg');
+      const resultGrid = document.getElementById('resultGrid');
+
+      if (!input) {
+        showError('Pilih tanggal lahir terlebih dahulu');
         return;
       }
 
-      const birthDate = new Date(birthdayInput.value);
+      const birthDate = new Date(input);
       const today = new Date();
 
       if (birthDate > today) {
-        showError("Tanggal lahir tidak boleh di masa depan");
+        showError('Tanggal lahir tidak boleh di masa depan');
         return;
       }
 
       hideError();
 
-      // Precise Age Calculation
       let years = today.getFullYear() - birthDate.getFullYear();
       let months = today.getMonth() - birthDate.getMonth();
       let days = today.getDate() - birthDate.getDate();
 
       if (days < 0) {
         months--;
-        const prevMonthLastDay = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
-        days += prevMonthLastDay;
+        const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += lastMonth.getDate();
       }
 
       if (months < 0) {
@@ -383,43 +231,25 @@
         months += 12;
       }
 
-      // Day Name
-      const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-      const birthDayName = dayNames[birthDate.getDay()];
+      document.getElementById('years').textContent = years;
+      document.getElementById('months').textContent = months;
+      document.getElementById('days').textContent = days;
 
-      // Total Days
-      const totalDaysLived = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24));
-
-      // Days until next birthday
-      let nextBday = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
-      if (today > nextBday) {
-        nextBday.setFullYear(today.getFullYear() + 1);
-      }
-      const daysToNextBday = Math.ceil((nextBday - today) / (1000 * 60 * 60 * 24));
-
-      // Render UI
-      document.getElementById("resYears").textContent = years;
-      document.getElementById("resMonths").textContent = months;
-      document.getElementById("resDays").textContent = days;
-      document.getElementById("resDayName").textContent = birthDayName;
-      document.getElementById("resTotalDays").textContent = totalDaysLived.toLocaleString('id-ID') + " Hari";
-      document.getElementById("resNextBday").textContent = daysToNextBday === 0 ? "Hari Ini! 🎉" : daysToNextBday + " Hari lagi";
-
-      resultsView.style.display = "flex";
+      resultGrid.style.display = 'grid';
     }
 
     function showError(msg) {
-      const errorMsg = document.getElementById("errorMsg");
-      const resultsView = document.getElementById("resultsView");
-      errorMsg.textContent = msg;
-      errorMsg.style.display = "block";
-      resultsView.style.display = "none";
+      const errorEl = document.getElementById('errorMsg');
+      const resultGrid = document.getElementById('resultGrid');
+      errorEl.textContent = msg;
+      errorEl.style.display = 'block';
+      resultGrid.style.display = 'none';
     }
 
     function hideError() {
-      const errorMsg = document.getElementById("errorMsg");
-      errorMsg.style.display = "none";
+      document.getElementById('errorMsg').style.display = 'none';
     }
   </script>
+
 </body>
 </html>

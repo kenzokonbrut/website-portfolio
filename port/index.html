@@ -1,575 +1,680 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kenzo Cloud — Enterprise Developer Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>KenzoVerse — Developer & Digital Technology Studio</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="KenzoVerse - Personal technology studio yang berfokus pada Web Development, Bot Automation, API Integration, dan Solusi Digital Berkelanjutan.">
+    <meta property="og:title" content="KenzoVerse — Developer & Digital Technology Studio">
+    <meta property="og:description" content="Building Digital Experiences That Actually Work. Web Development, Bots, and Custom APIs.">
+    <meta property="og:type" content="website">
+
+    <!-- Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
     <style>
+        /* --- CSS VARIABLES & THEME CONFIGURATION --- */
         :root {
-            --bg-base: #090a0f;
-            --bg-surface: #10131a;
-            --bg-surface-hover: #171b24;
-            --bg-input: #07090e;
+            --bg-dark: #080B11;
+            --bg-card: rgba(18, 24, 38, 0.7);
+            --bg-card-hover: rgba(26, 35, 54, 0.85);
+            --bg-surface: #0E131F;
             
             --border: rgba(255, 255, 255, 0.08);
-            --border-hover: rgba(255, 255, 255, 0.2);
-            --border-focus: #3b82f6;
+            --border-hover: rgba(0, 240, 255, 0.3);
             
-            --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.15);
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
+            --accent-cyan: #00F0FF;
+            --accent-blue: #3B82F6;
+            --accent-purple: #6366F1;
+            --accent-glow: rgba(0, 240, 255, 0.12);
             
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --text-dim: #6b7280;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --text-dim: #64748B;
             
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 16px;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            
+            --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        /* --- CSS RESET --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); }
+        body { overflow-x: hidden; min-height: 100vh; line-height: 1.6; }
         
-        body {
-            background-color: var(--bg-base);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            overflow-x: hidden;
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
 
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
         .hidden { display: none !important; }
+        
+        /* --- UTILITY CLASSES & GLASSMORPHISM --- */
+        .glass-panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+        }
+        .glass-panel:hover {
+            border-color: var(--border-hover);
+            box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.08);
+        }
 
-        /* Toast Notifications */
-        #toast-container {
-            position: fixed; bottom: 24px; right: 24px; z-index: 1000;
-            display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+        .gradient-text {
+            background: linear-gradient(135deg, #FFFFFF 20%, var(--accent-cyan) 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .toast {
-            background: var(--bg-surface); border: 1px solid var(--border);
-            padding: 12px 18px; border-radius: var(--radius-md); font-size: 0.825rem; font-weight: 500;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6); pointer-events: auto;
-            transform: translateY(20px); opacity: 0; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; align-items: center; gap: 10px; max-width: 320px;
-        }
-        .toast.show { transform: translateY(0); opacity: 1; }
-        .toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-        .toast.success .toast-dot { background: var(--success); }
-        .toast.error .toast-dot { background: var(--danger); }
-        .toast.info .toast-dot { background: var(--accent); }
 
-        /* --- AUTH SCREEN --- */
-        #auth-wrapper {
-            position: fixed; inset: 0; background: var(--bg-base); z-index: 500;
-            display: flex; align-items: center; justify-content: center; padding: 20px;
-            background-image: radial-gradient(circle at 50% 20%, rgba(59, 130, 246, 0.06), transparent 60%);
+        .section-tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 500;
+            color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.1em;
+            margin-bottom: 12px; padding: 4px 12px; background: rgba(0, 240, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.15); border-radius: 20px;
         }
-        .auth-card {
-            background: var(--bg-surface); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); padding: 40px; width: 100%; max-width: 400px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
-        }
-        .auth-logo {
-            width: 42px; height: 42px; background: var(--text-main); color: var(--bg-base);
-            border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 1.2rem; margin-bottom: 20px;
-        }
-        .auth-card h1 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 4px; }
-        .auth-card p { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 24px; }
-
-        .auth-tabs {
-            display: flex; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
-            border-radius: var(--radius-sm); padding: 3px; margin-bottom: 20px;
-        }
-        .auth-tab {
-            flex: 1; padding: 7px; border: none; background: transparent; color: var(--text-muted);
-            font-size: 0.8rem; font-weight: 500; border-radius: 4px; cursor: pointer; transition: 0.2s;
-        }
-        .auth-tab.active { background: var(--bg-surface-hover); color: var(--text-main); font-weight: 600; }
-
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 0.75rem; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
-        .form-control {
-            width: 100%; padding: 10px 14px; background: var(--bg-input);
-            border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-main);
-            font-size: 0.875rem; outline: none; transition: border-color 0.2s;
-        }
-        .form-control:focus { border-color: var(--border-focus); box-shadow: 0 0 0 2px var(--accent-glow); }
 
         .btn {
-            width: 100%; padding: 10px 16px; border-radius: var(--radius-sm); font-weight: 500; font-size: 0.875rem;
-            cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none;
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 12px 24px; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition); text-decoration: none; border: none;
         }
-        .btn-primary { background: var(--text-main); color: var(--bg-base); }
-        .btn-primary:hover { opacity: 0.9; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
-        .btn-outline:hover { background: var(--bg-surface-hover); border-color: var(--border-hover); }
-        .btn-danger-soft { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--danger); }
-        .btn-danger-soft:hover { background: rgba(239, 68, 68, 0.2); }
-
-        /* --- APP DASHBOARD LAYOUT --- */
-        #app-wrapper { display: flex; width: 100%; min-height: 100vh; }
-        
-        /* Sidebar */
-        aside {
-            width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; justify-content: space-between; padding: 24px 16px;
-            flex-shrink: 0;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: #FFF; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
         }
-        .sidebar-top .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 20px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
-        .brand-badge { width: 28px; height: 28px; background: var(--accent); color: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
-        .brand-name { font-weight: 600; font-size: 0.9rem; letter-spacing: -0.01em; }
+        .btn-primary:hover {
+            opacity: 0.95; transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(59, 130, 246, 0.5);
+        }
+        .btn-outline {
+            background: transparent; color: var(--text-main); border: 1px solid var(--border);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05); border-color: var(--text-muted); transform: translateY(-2px);
+        }
 
-        .nav-list { display: flex; flex-direction: column; gap: 4px; }
+        /* --- NAVBAR --- */
+        header.navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            height: 72px; display: flex; align-items: center;
+            background: rgba(8, 11, 17, 0.8); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); transition: var(--transition);
+        }
+        .nav-container { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .brand-logo {
+            font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text-main);
+            text-decoration: none; display: flex; align-items: center; gap: 8px;
+        }
+        .brand-logo span.accent { color: var(--accent-cyan); }
+        .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
         .nav-link {
-            display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius-sm);
-            color: var(--text-muted); font-size: 0.85rem; font-weight: 500; text-decoration: none; cursor: pointer; transition: 0.15s;
+            color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            transition: var(--transition);
         }
-        .nav-link:hover { background: var(--bg-surface-hover); color: var(--text-main); }
-        .nav-link.active { background: var(--bg-surface-hover); color: var(--text-main); font-weight: 600; }
+        .nav-link:hover, .nav-link.active { color: var(--accent-cyan); }
 
-        .sidebar-user {
-            display: flex; align-items: center; justify-content: space-between; padding: 12px;
-            background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-md);
+        .mobile-toggle { display: none; background: none; border: none; color: var(--text-main); cursor: pointer; }
+
+        /* Mobile Drawer */
+        .mobile-menu {
+            position: fixed; inset: 0; top: 72px; background: var(--bg-dark); z-index: 999;
+            padding: 32px 24px; display: flex; flex-direction: column; gap: 24px;
+            transform: translateX(100%); transition: transform 0.3s ease-in-out;
         }
-        .user-mini { display: flex; align-items: center; gap: 10px; overflow: hidden; }
-        .avatar-sm { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-        .user-meta .name { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
-        .user-meta .email { font-size: 0.7rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+        .mobile-menu.open { transform: translateX(0); }
+        .mobile-menu .nav-link { font-size: 1.2rem; }
 
-        /* Main Content Panel */
-        main { flex: 1; display: flex; flex-direction: column; background: var(--bg-base); overflow-y: auto; max-height: 100vh; }
-        
-        header.topbar {
-            height: 64px; border-bottom: 1px solid var(--border); display: flex; align-items: center;
-            justify-content: space-between; padding: 0 32px; background: rgba(16, 19, 26, 0.4); backdrop-filter: blur(10px);
-            position: sticky; top: 0; z-index: 10;
+        /* --- HERO SECTION --- */
+        section.hero {
+            padding: 160px 0 100px; position: relative; overflow: hidden;
+            background: radial-gradient(circle at 80% 20%, rgba(0, 240, 255, 0.05), transparent 40%),
+                        radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.05), transparent 40%);
         }
-        .topbar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: -0.01em; }
-        .topbar-actions { display: flex; align-items: center; gap: 12px; }
+        .hero-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 48px; align-items: center; }
+        .hero-title { font-size: 3.2rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.03em; margin: 16px 0; }
+        .hero-subtitle { font-size: 1.1rem; color: var(--text-muted); max-width: 540px; margin-bottom: 32px; }
+        .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
 
-        .content-body { padding: 32px; max-width: 1000px; width: 100%; margin: 0 auto; }
-        .view-section { display: flex; flex-direction: column; gap: 24px; }
-
-        .section-header-flex { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
-        .section-title { font-size: 1.15rem; font-weight: 600; letter-spacing: -0.01em; }
-        .section-subtitle { font-size: 0.825rem; color: var(--text-muted); margin-top: 2px; }
-
-        /* Dashboard Overview & Cards */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
-        .stat-card {
-            background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px;
+        /* Visual Code Terminal */
+        .code-terminal {
+            background: #0B0F19; border: 1px solid var(--border); border-radius: var(--radius-md);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; font-family: 'JetBrains Mono', monospace;
         }
-        .stat-card .label { font-size: 0.78rem; font-weight: 500; color: var(--text-muted); }
-        .stat-card .value { font-size: 1.6rem; font-weight: 700; margin: 8px 0 2px; letter-spacing: -0.02em; }
-        .stat-card .trend { font-size: 0.72rem; color: var(--success); display: flex; align-items: center; gap: 4px; }
+        .terminal-header {
+            background: rgba(255,255,255,0.03); padding: 12px 16px; display: flex; align-items: center;
+            gap: 8px; border-bottom: 1px solid var(--border);
+        }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-red { background: #FF5F56; } .dot-yellow { background: #FFBD2E; } .dot-green { background: #27C93F; }
+        .terminal-title { margin-left: auto; font-size: 0.75rem; color: var(--text-dim); }
+        .terminal-body { padding: 20px; font-size: 0.85rem; line-height: 1.8; color: #A7F3D0; }
+        .code-keyword { color: #F472B6; } .code-func { color: #60A5FA; } .code-str { color: #FDE047; }
 
-        .card-panel {
-            background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px;
+        /* --- ABOUT SECTION --- */
+        section.about { padding: 100px 0; }
+        .about-grid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 48px; align-items: center; }
+        .profile-card {
+            text-align: center; padding: 40px 24px; position: relative;
+        }
+        .avatar-wrapper {
+            width: 120px; height: 120px; margin: 0 auto 20px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); padding: 3px;
+        }
+        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: var(--bg-surface); }
+        .profile-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+        .profile-role { font-size: 0.85rem; color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 32px; }
+        .stat-item { padding: 16px; text-align: center; }
+        .stat-number { font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* --- SERVICES SECTION --- */
+        section.services { padding: 100px 0; background: rgba(255,255,255,0.01); }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-top: 40px; }
+        .service-card { padding: 32px; display: flex; flex-direction: column; gap: 16px; }
+        .service-icon {
+            width: 48px; height: 48px; border-radius: var(--radius-sm);
+            background: var(--accent-glow); color: var(--accent-cyan);
+            display: flex; align-items: center; justify-content: center;
         }
 
-        /* Activity Log List */
-        .activity-item {
-            display: flex; align-items: center; justify-content: space-between; padding: 12px 0;
-            border-bottom: 1px solid var(--border); font-size: 0.85rem;
-        }
-        .activity-item:last-child { border-bottom: none; }
-        .activity-desc { color: var(--text-muted); }
-        .activity-time { font-size: 0.75rem; color: var(--text-dim); }
+        /* --- TECH STACK SECTION --- */
+        section.skills { padding: 100px 0; }
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 40px; }
+        .skill-card { padding: 20px; display: flex; align-items: center; gap: 16px; }
+        .skill-icon { width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 
-        /* Profile View Grid */
-        .profile-grid { display: grid; grid-template-columns: 240px 1fr; gap: 24px; }
-        @media(max-width: 768px) {
-            #app-wrapper { flex-direction: column; }
-            aside { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-            .profile-grid { grid-template-columns: 1fr; }
+        /* --- PROJECTS SECTION --- */
+        section.projects { padding: 100px 0; }
+        .filter-tabs { display: flex; gap: 12px; margin: 32px 0; flex-wrap: wrap; }
+        .filter-btn {
+            padding: 8px 18px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;
+            background: transparent; color: var(--text-muted); border: 1px solid var(--border); cursor: pointer; transition: var(--transition);
+        }
+        .filter-btn.active, .filter-btn:hover { background: var(--text-main); color: var(--bg-dark); border-color: var(--text-main); }
+
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 28px; }
+        .project-card { overflow: hidden; display: flex; flex-direction: column; cursor: pointer; }
+        .project-thumb {
+            width: 100%; height: 200px; background: #1A202C; overflow: hidden; position: relative;
+        }
+        .project-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+        .project-card:hover .project-thumb img { transform: scale(1.05); }
+        .project-body { padding: 24px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+        .project-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+        .tag { font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+        /* Modal Detail Project */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: var(--transition);
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            max-width: 650px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 32px; position: relative;
+        }
+        .modal-close {
+            position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-muted);
+            font-size: 1.5rem; cursor: pointer;
         }
 
-        .avatar-preview-box {
-            text-align: center; background: var(--bg-surface); border: 1px solid var(--border);
-            border-radius: var(--radius-md); padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px;
+        /* --- JOURNEY TIMELINE --- */
+        section.journey { padding: 100px 0; background: rgba(255,255,255,0.01); }
+        .timeline { position: relative; max-width: 700px; margin: 40px auto 0; padding-left: 30px; }
+        .timeline::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+            background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-purple));
         }
-        .avatar-lg { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+        .timeline-item { position: relative; margin-bottom: 36px; }
+        .timeline-node {
+            position: absolute; left: -35px; top: 4px; width: 12px; height: 12px;
+            border-radius: 50%; background: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan);
+        }
+        .timeline-date { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-cyan); margin-bottom: 4px; }
 
-        .badge-status {
-            display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px;
-            background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);
-            color: var(--success); font-size: 0.72rem; font-weight: 600; border-radius: 20px;
+        /* --- CONTACT SECTION --- */
+        section.contact { padding: 100px 0; }
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 40px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 8px; color: var(--text-muted); }
+        .form-input {
+            width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text-main); outline: none; transition: var(--transition);
+        }
+        .form-input:focus { border-color: var(--accent-cyan); background: rgba(0,240,255,0.02); }
+
+        /* --- FOOTER --- */
+        footer { padding: 40px 0; border-top: 1px solid var(--border); text-align: center; font-size: 0.85rem; color: var(--text-dim); }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 900px) {
+            .hero-grid, .about-grid, .contact-grid { grid-template-columns: 1fr; }
+            .hero-title { font-size: 2.4rem; }
+            .nav-links { display: none; }
+            .mobile-toggle { display: block; }
         }
     </style>
 </head>
 <body>
 
-    <div id="toast-container"></div>
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="#" class="brand-logo">
+                <span id="nav-brand">KenzoVerse</span><span class="accent">.</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="#skills" class="nav-link">Tech Stack</a></li>
+                <li><a href="#projects" class="nav-link">Projects</a></li>
+                <li><a href="#journey" class="nav-link">Journey</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <a href="#contact" class="btn btn-primary btn-cta-nav" style="padding: 8px 18px; font-size: 0.85rem;">Let's Work Together</a>
+            <button class="mobile-toggle" onclick="toggleMobileMenu()" aria-label="Toggle Navigation Menu">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+        </div>
+    </header>
 
-    <!-- 1. AUTHENTICATION VIEW -->
-    <div id="auth-wrapper">
-        <div class="auth-card">
-            <div class="auth-logo">K</div>
-            <h1 id="auth-title">Selamat Datang</h1>
-            <p id="auth-subtitle">Kelola platform dan infrastruktur Anda dengan aman.</p>
+    <!-- MOBILE MENU DRAWER -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#home" class="nav-link" onclick="toggleMobileMenu()">Home</a>
+        <a href="#about" class="nav-link" onclick="toggleMobileMenu()">About</a>
+        <a href="#services" class="nav-link" onclick="toggleMobileMenu()">Services</a>
+        <a href="#skills" class="nav-link" onclick="toggleMobileMenu()">Tech Stack</a>
+        <a href="#projects" class="nav-link" onclick="toggleMobileMenu()">Projects</a>
+        <a href="#journey" class="nav-link" onclick="toggleMobileMenu()">Journey</a>
+        <a href="#contact" class="nav-link" onclick="toggleMobileMenu()">Contact</a>
+        <a href="#contact" class="btn btn-primary" onclick="toggleMobileMenu()">Let's Work Together</a>
+    </div>
 
-            <div class="auth-tabs">
-                <button class="auth-tab active" id="tab-login" onclick="switchAuthMode('login')">Masuk</button>
-                <button class="auth-tab" id="tab-signup" onclick="switchAuthMode('signup')">Daftar Akun</button>
+    <!-- HERO SECTION -->
+    <section class="hero" id="home">
+        <div class="container hero-grid">
+            <div>
+                <span class="section-tag" id="hero-tag">PERSONAL TECHNOLOGY STUDIO</span>
+                <h1 class="hero-title" id="hero-headline">Building Digital Experiences That Actually Work.</h1>
+                <p class="hero-subtitle" id="hero-subheadline">KenzoVerse adalah personal technology studio yang berfokus membangun website modern, bot otomatisasi, API integrasi, dan solusi digital performa tinggi.</p>
+                <div class="hero-actions">
+                    <a href="#projects" class="btn btn-primary">View Projects</a>
+                    <a href="#contact" class="btn btn-outline">Contact Me</a>
+                </div>
+            </div>
+            <div class="code-terminal">
+                <div class="terminal-header">
+                    <div class="dot dot-red"></div>
+                    <div class="dot dot-yellow"></div>
+                    <div class="dot dot-green"></div>
+                    <div class="terminal-title">kenzoverse-core.ts</div>
+                </div>
+                <div class="terminal-body">
+<span class="code-keyword">import</span> { Studio } <span class="code-keyword">from</span> <span class="code-str">'@kenzoverse/core'</span>;
+
+<span class="code-keyword">const</span> studio = <span class="code-keyword">new</span> Studio({
+  developer: <span class="code-str">'Kenzo'</span>,
+  stack: [<span class="code-str">'Node.js'</span>, <span class="code-str">'JavaScript'</span>, <span class="code-str">'REST API'</span>],
+  status: <span class="code-str">'Ready for New Projects'</span>
+});
+
+studio.<span class="code-func">deploySolution</span>();
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section class="about" id="about">
+        <div class="container about-grid">
+            <div class="glass-panel profile-card">
+                <div class="avatar-wrapper">
+                    <img src="https://ui-avatars.com/api/?name=Kenzo&background=0E131F&color=00F0FF&bold=true&size=200" alt="Kenzo Avatar" class="avatar-img" id="about-avatar">
+                </div>
+                <h3 class="profile-name" id="about-name">Kenzo</h3>
+                <div class="profile-role" id="about-role">Founder & Software Developer</div>
+                
+                <div class="stats-grid" id="stats-container">
+                    <!-- Dynamic Stats Injected Here -->
+                </div>
             </div>
 
-            <form onsubmit="handleAuthSubmit(event)">
-                <div class="form-group hidden" id="group-fullname">
-                    <label>Nama Lengkap</label>
-                    <input type="text" id="input-fullname" class="form-control" placeholder="Kenzo Developer">
+            <div>
+                <span class="section-tag">ABOUT KENZOVERSE</span>
+                <h2 style="font-size: 2rem; margin-bottom: 16px;">Pengembangan Solusi Digital Berbasis Kualitas & Efisiensi</h2>
+                <p style="color: var(--text-muted); margin-bottom: 16px;" id="about-bio">
+                    Berawal dari ketertarikan mendalam terhadap arsitektur perangkat lunak, KenzoVerse didirikan sebagai wadah eksperimen dan eksplorasi teknologi digital. Kami berfokus pada pengembangan sistem web yang scalable, bot otomatisasi efisien, dan integrasi API yang lancar.
+                </p>
+                <p style="color: var(--text-muted);">
+                    Setiap baris kode ditulis dengan prinsip kestabilan, performa tinggi, dan pengalaman pengguna yang optimal tanpa kerumitan yang tidak perlu.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES SECTION -->
+    <section class="services" id="services">
+        <div class="container">
+            <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+                <span class="section-tag">WHAT I BUILD</span>
+                <h2 style="font-size: 2rem;">Layanan & Solusi Digital</h2>
+            </div>
+            <div class="services-grid" id="services-container">
+                <!-- Dynamic Services Injected Here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- TECH STACK SECTION -->
+    <section class="skills" id="skills">
+        <div class="container">
+            <span class="section-tag">TECH STACK</span>
+            <h2 style="font-size: 2rem;">Teknologi & Tools Yang Digunakan</h2>
+            <div class="skills-grid" id="skills-container">
+                <!-- Dynamic Skills Injected Here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- PROJECTS SECTION -->
+    <section class="projects" id="projects">
+        <div class="container">
+            <span class="section-tag">PORTFOLIO</span>
+            <h2 style="font-size: 2rem;">Proyek Pilihan</h2>
+            
+            <div class="filter-tabs" id="project-filters">
+                <button class="filter-btn active" onclick="filterProjects('all', this)">All</button>
+                <button class="filter-btn" onclick="filterProjects('web', this)">Web App</button>
+                <button class="filter-btn" onclick="filterProjects('bot', this)">Bot Automation</button>
+                <button class="filter-btn" onclick="filterProjects('api', this)">API Integration</button>
+            </div>
+
+            <div class="projects-grid" id="projects-container">
+                <!-- Dynamic Projects Injected Here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- JOURNEY SECTION -->
+    <section class="journey" id="journey">
+        <div class="container">
+            <div style="text-align: center;">
+                <span class="section-tag">MILESTONES</span>
+                <h2 style="font-size: 2rem;">Perjalanan & Eksplorasi</h2>
+            </div>
+            <div class="timeline" id="timeline-container">
+                <!-- Dynamic Timeline Injected Here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section class="contact" id="contact">
+        <div class="container contact-grid">
+            <div>
+                <span class="section-tag">GET IN TOUCH</span>
+                <h2 style="font-size: 2.2rem; margin-bottom: 16px;">Have an idea? Let's build it together.</h2>
+                <p style="color: var(--text-muted); margin-bottom: 32px;">
+                    Siap mendiskusikan kebutuhan sistem, otomatisasi bot, atau pembuatan aplikasi web kustom.
+                </p>
+                
+                <div style="display: flex; flex-direction: column; gap: 16px;" id="contact-info-list">
+                    <!-- Injected Contacts -->
                 </div>
-                <div class="form-group">
-                    <label>Email Perusahaan / Pribadi</label>
-                    <input type="email" id="input-email" class="form-control" placeholder="kenzo@admin.io" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="input-password" class="form-control" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn btn-primary" id="btn-submit-text" style="margin-top: 6px;">Masuk ke Dashboard</button>
-            </form>
-            <button class="btn btn-outline" style="margin-top: 10px;" onclick="loadDemoAccount()">⚡ Isi Data Demo Cepat</button>
+            </div>
+
+            <div class="glass-panel" style="padding: 32px;">
+                <form id="contact-form" onsubmit="handleFormSubmit(event)">
+                    <div class="form-group">
+                        <label class="form-label">Nama Lengkap</label>
+                        <input type="text" id="form-name" class="form-control form-input" placeholder="Masukkan nama Anda" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="form-email" class="form-control form-input" placeholder="nama@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Pesan / Kebutuhan Proyek</label>
+                        <textarea id="form-message" class="form-control form-input" rows="4" placeholder="Jelaskan kebutuhan Anda..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Kirim Pesan</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p id="footer-text">&copy; 2026 KenzoVerse. Building, learning, and creating digital experiences.</p>
+        </div>
+    </footer>
+
+    <!-- MODAL DETAIL PROJECT -->
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h3 id="modal-title" style="font-size: 1.5rem; margin-bottom: 8px;">-</h3>
+            <div id="modal-tags" class="project-tags" style="margin-bottom: 16px;"></div>
+            <p id="modal-desc" style="color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">-</p>
+            <div style="display: flex; gap: 12px;" id="modal-actions"></div>
         </div>
     </div>
 
-    <!-- 2. APP DASHBOARD VIEW -->
-    <div id="app-wrapper" class="hidden">
-        <!-- Sidebar Navigation -->
-        <aside>
-            <div class="sidebar-top">
-                <div class="brand">
-                    <div class="brand-badge">K</div>
-                    <span class="brand-name">Kenzo Cloud OS</span>
-                </div>
-                <div class="nav-list">
-                    <a class="nav-link active" onclick="switchView('overview', this)">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
-                        Overview
-                    </a>
-                    <a class="nav-link" onclick="switchView('projects', this)">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                        Infrastruktur & Proyek
-                    </a>
-                    <a class="nav-link" onclick="switchView('profile', this)">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        Pengaturan Profil
-                    </a>
-                </div>
-            </div>
-
-            <div class="sidebar-user">
-                <div class="user-mini">
-                    <img src="" id="sidebar-avatar" class="avatar-sm" alt="Avatar">
-                    <div class="user-meta">
-                        <div class="name" id="sidebar-name">-</div>
-                        <div class="email" id="sidebar-email">-</div>
-                    </div>
-                </div>
-                <button class="btn btn-outline" style="padding: 6px 10px; font-size: 0.75rem;" onclick="handleLogout()">Keluar</button>
-            </div>
-        </aside>
-
-        <!-- Main Workspace -->
-        <main>
-            <header class="topbar">
-                <div class="topbar-title" id="topbar-title">Overview Dashboard</div>
-                <div class="topbar-actions">
-                    <span class="badge-status">
-                        <span style="width:6px;height:6px;background:var(--success);border-radius:50%;"></span> 
-                        System Operational
-                    </span>
-                </div>
-            </header>
-
-            <div class="content-body">
-                <!-- VIEW 1: OVERVIEW -->
-                <div id="view-overview" class="view-section">
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="label">Server Uptime</div>
-                            <div class="value">99.99%</div>
-                            <div class="trend">↑ Optimal Performance</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="label">Active Node Clusters</div>
-                            <div class="value">8 Active</div>
-                            <div class="trend">Auto-scaled securely</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="label">Database Queries/sec</div>
-                            <div class="value">1.4k</div>
-                            <div class="trend">Latency &lt; 12ms</div>
-                        </div>
-                    </div>
-
-                    <div class="card-panel" style="margin-top: 8px;">
-                        <div class="section-header-flex" style="margin-bottom: 12px;">
-                            <div>
-                                <h3 class="section-title">Aktivitas Sesi Terakhir</h3>
-                                <div class="section-subtitle">Log autentikasi dan pembaruan sistem secara real-time</div>
-                            </div>
-                        </div>
-                        <div id="activity-log-container">
-                            <!-- Injected by JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW 2: PROJECTS -->
-                <div id="view-projects" class="view-section hidden">
-                    <div class="section-header-flex">
-                        <div>
-                            <h3 class="section-title">Infrastruktur & Layanan</h3>
-                            <div class="section-subtitle">Daftar layanan node dan otomatisasi sistem server aktif</div>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-                        <div class="card-panel">
-                            <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 6px;">Pterodactyl Daemon Hub</h4>
-                            <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">Manajemen container server game otomatis dengan integrasi resource monitor dan auto-backup harian.</p>
-                            <span class="badge-status">Running • Port 8080</span>
-                        </div>
-                        <div class="card-panel">
-                            <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 6px;">WhatsApp Baileys Gateway</h4>
-                            <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">Sistem mikroservis berbasis multi-session untuk menangani webhook event dan integrasi notifikasi klien.</p>
-                            <span class="badge-status">Connected • Cluster #2</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW 3: PROFILE SETTINGS -->
-                <div id="view-profile" class="view-section hidden">
-                    <div class="section-header-flex">
-                        <div>
-                            <h3 class="section-title">Pengaturan Akun & Profil</h3>
-                            <div class="section-subtitle">Kelola identitas personal dan kredensial akses eksekutif Anda</div>
-                        </div>
-                    </div>
-
-                    <div class="profile-grid">
-                        <div class="avatar-preview-box">
-                            <img src="" id="profile-display-avatar" class="avatar-lg" alt="Avatar">
-                            <div>
-                                <h4 id="profile-display-name" style="font-size: 0.95rem; font-weight: 600;">-</h4>
-                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;" id="profile-display-email">-</p>
-                            </div>
-                        </div>
-
-                        <div class="card-panel">
-                            <form onsubmit="handleProfileUpdate(event)">
-                                <div class="form-group">
-                                    <label>Nama Lengkap</label>
-                                    <input type="text" id="input-edit-name" class="form-control" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>URL Avatar Foto</label>
-                                    <input type="text" id="input-edit-avatar" class="form-control" placeholder="https://...">
-                                </div>
-                                <div class="form-group">
-                                    <label>Jabatan / Title</label>
-                                    <input type="text" id="input-edit-title" class="form-control" placeholder="Contoh: Lead Systems Architect">
-                                </div>
-                                <button type="submit" class="btn btn-primary" style="margin-top: 8px;">Simpan Perubahan Profil</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
+    <!-- GLOBAL SITE CONFIGURATION & JS LOGIC -->
     <script>
-        const STORAGE_USERS = 'kenzo_enterprise_users';
-        const STORAGE_SESSION = 'kenzo_enterprise_session';
-        const STORAGE_LOGS = 'kenzo_enterprise_logs';
-
-        let authMode = 'login'; // 'login' | 'signup'
-
-        // Toast System
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `<div class="toast-dot"></div><span>${message}</span>`;
-            container.appendChild(toast);
-
-            setTimeout(() => toast.classList.add('show'), 50);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 250);
-            }, 3000);
-        }
-
-        // Switch Auth Mode Tabs
-        function switchAuthMode(mode) {
-            authMode = mode;
-            document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-            document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
-            document.getElementById('group-fullname').classList.toggle('hidden', mode === 'login');
-            document.getElementById('btn-submit-text').textContent = mode === 'login' ? 'Masuk ke Dashboard' : 'Daftar Akun Baru';
-        }
-
-        // Add System Log
-        function logActivity(actionDesc) {
-            let logs = JSON.parse(localStorage.getItem(STORAGE_LOGS) || '[]');
-            logs.unshift({ desc: actionDesc, time: new Date().toLocaleTimeString('id-ID') + ' WIB' });
-            if (logs.length > 5) logs.pop();
-            localStorage.setItem(STORAGE_LOGS, JSON.stringify(logs));
-        }
-
-        // Load Demo Fast
-        function loadDemoAccount() {
-            document.getElementById('input-email').value = 'kenzo@admin.io';
-            document.getElementById('input-password').value = 'admin123';
-            switchAuthMode('login');
-            showToast('Kredensial demo diisi otomatis!', 'info');
-        }
-
-        // Auth Form Submission Handler
-        function handleAuthSubmit(e) {
-            e.preventDefault();
-            const email = document.getElementById('input-email').value.trim();
-            const password = document.getElementById('input-password').value.trim();
-            const fullname = document.getElementById('input-fullname').value.trim();
-
-            let users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
-
-            if (authMode === 'signup') {
-                if (users.some(u => u.email === email)) {
-                    return showToast('Email sudah terdaftar di sistem!', 'error');
+        /* 
+           ==================================================================
+           SITE CONFIGURATION DATA OBJECT
+           Ganti isi data di bawah ini untuk mengubah seluruh tampilan website
+           ==================================================================
+        */
+        const SITE_CONFIG = {
+            brand: {
+                name: "KenzoVerse",
+                tagline: "Building Digital Experiences That Actually Work.",
+                subheadline: "KenzoVerse adalah personal technology studio milik seorang developer muda yang berfokus membangun website modern, bot otomatisasi, API integrasi, dan solusi digital berkualitas tinggi."
+            },
+            personal: {
+                name: "Kenzo",
+                role: "Founder & Software Developer",
+                avatar: "https://ui-avatars.com/api/?name=Kenzo&background=0E131F&color=00F0FF&bold=true&size=200",
+                bio: "Berawal dari passion mendalam di bidang pemrograman dan otomatisasi, KenzoVerse didirikan untuk mengeksplorasi pembuatan aplikasi modern yang responsif dan reliabel.",
+                stats: [
+                    { label: "Projects Built", value: "15+" },
+                    { label: "Tech Stack", value: "10+" },
+                    { label: "Years Learning", value: "2+" },
+                    { label: "Uptime Focus", value: "99.9%" }
+                ]
+            },
+            services: [
+                { title: "Web Development", desc: "Aplikasi web modern, responsif, dan performa tinggi berbasis standar UI/UX terkini.", icon: "🌐" },
+                { title: "Bot Automation", desc: "Solusi bot otomatisasi untuk WhatsApp, Telegram, dan workflow kustom.", icon: "🤖" },
+                { title: "API Integration", desc: "Integrasi REST API, microservices, dan koneksi antar platform digital.", icon: "⚡" },
+                { title: "Digital Solutions", desc: "Pengembangan tools khusus dan optimasi infrastruktur sesuai kebutuhan.", icon: "🛠️" }
+            ],
+            skills: [
+                { name: "Frontend Web", category: "Frontend", desc: "HTML5, CSS3, Modern JS (ES6+)", icon: "💻" },
+                { name: "Node.js", category: "Backend", desc: "Server runtime & API backend", icon: "🟢" },
+                { name: "Python", category: "Language", desc: "Automation, scripts & bots", icon: "🐍" },
+                { name: "REST API", category: "Backend", desc: "Architecture & Integration", icon: "📡" },
+                { name: "WhatsApp Baileys", category: "Bot", desc: "Multi-device Bot Automation", icon: "💬" },
+                { name: "Git & GitHub", category: "Tools", desc: "Version Control & Workflow", icon: "🐙" }
+            ],
+            projects: [
+                {
+                    id: 1,
+                    title: "Pterodactyl Automation Dashboard",
+                    category: "web",
+                    tags: ["Node.js", "REST API", "Tailwind"],
+                    desc: "Sistem otomatisasi manajemen server Pterodactyl terintegrasi dengan webhook notifikasi real-time.",
+                    github: "https://github.com",
+                    demo: "https://demo.com"
+                },
+                {
+                    id: 2,
+                    title: "Multi-Device WhatsApp Bot Solution",
+                    category: "bot",
+                    tags: ["JavaScript", "Baileys API", "Node.js"],
+                    desc: "Bot WhatsApp otomatis dengan dukungan multi-sesi untuk layanan informasi dan transaksi otomatis.",
+                    github: "https://github.com",
+                    demo: "https://demo.com"
+                },
+                {
+                    id: 3,
+                    title: "Custom Payment Gateway Gateway Bridge",
+                    category: "api",
+                    tags: ["REST API", "Express.js", "JSON"],
+                    desc: "Bridge integrasi API pembayaran untuk verifikasi mutasi otomatis secara aman.",
+                    github: "https://github.com",
+                    demo: "https://demo.com"
                 }
-                const newUser = {
-                    email, password,
-                    name: fullname || 'Kenzo Developer',
-                    title: 'Senior Infrastructure Engineer',
-                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullname || email)}&background=171b24&color=f3f4f6&bold=true`
-                };
-                users.push(newUser);
-                localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
-                localStorage.setItem(STORAGE_SESSION, JSON.stringify(newUser));
-                logActivity('Akun baru berhasil didaftarkan');
-                showToast('Pendaftaran akun berhasil!', 'success');
-            } else {
-                const user = users.find(u => u.email === email && u.password === password);
-                if (!user) {
-                    return showToast('Email atau password salah!', 'error');
-                }
-                localStorage.setItem(STORAGE_SESSION, JSON.stringify(user));
-                logActivity('Sesi login baru diinisialisasi');
-                showToast('Selamat datang kembali, ' + user.name + '!', 'success');
-            }
-            renderApp();
+            ],
+            timeline: [
+                { year: "2024", title: "Inisiasi Pemrograman", desc: "Mulai mempelajari dasar-dasar algoritma, HTML, CSS, dan JavaScript." },
+                { year: "2025", title: "Eksplorasi Backend & Bot", desc: "Fokus pada pembuatan bot otomatisasi WhatsApp/Telegram dan integrasi API." },
+                { year: "2026", title: "Pendirian KenzoVerse Studio", desc: "Membangun identitas KenzoVerse sebagai personal technology studio profesional." }
+            ],
+            contacts: [
+                { type: "Email", value: "kenzo@kenzoverse.io", link: "mailto:kenzo@kenzoverse.io" },
+                { type: "WhatsApp", value: "+62 812-3456-7890", link: "https://wa.me/" },
+                { type: "GitHub", value: "github.com/kenzoverse", link: "https://github.com" }
+            ]
+        };
+
+        // RENDER LOGIC
+        function initWebsite() {
+            // Stats
+            const statsContainer = document.getElementById('stats-container');
+            statsContainer.innerHTML = SITE_CONFIG.personal.stats.map(s => `
+                <div class="stat-item glass-panel">
+                    <div class="stat-number">${s.value}</div>
+                    <div class="stat-label">${s.label}</div>
+                </div>
+            `).join('');
+
+            // Services
+            const servicesContainer = document.getElementById('services-container');
+            servicesContainer.innerHTML = SITE_CONFIG.services.map(s => `
+                <div class="glass-panel service-card">
+                    <div class="service-icon">${s.icon}</div>
+                    <h3 style="font-size:1.1rem; font-weight:600;">${s.title}</h3>
+                    <p style="font-size:0.85rem; color:var(--text-muted);">${s.desc}</p>
+                </div>
+            `).join('');
+
+            // Skills
+            const skillsContainer = document.getElementById('skills-container');
+            skillsContainer.innerHTML = SITE_CONFIG.skills.map(s => `
+                <div class="glass-panel skill-card">
+                    <div class="skill-icon">${s.icon}</div>
+                    <div>
+                        <div style="font-weight:600; font-size:0.9rem;">${s.name}</div>
+                        <div style="font-size:0.75rem; color:var(--text-dim);">${s.desc}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Projects
+            renderProjects('all');
+
+            // Timeline
+            const timelineContainer = document.getElementById('timeline-container');
+            timelineContainer.innerHTML = SITE_CONFIG.timeline.map(t => `
+                <div class="timeline-item">
+                    <div class="timeline-node"></div>
+                    <div class="timeline-date">${t.year}</div>
+                    <h4 style="font-size:1rem; font-weight:600;">${t.title}</h4>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">${t.desc}</p>
+                </div>
+            `).join('');
+
+            // Contacts
+            const contactInfoList = document.getElementById('contact-info-list');
+            contactInfoList.innerHTML = SITE_CONFIG.contacts.map(c => `
+                <a href="${c.link}" target="_blank" class="glass-panel" style="padding:16px; text-decoration:none; color:var(--text-main); display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-weight:500; font-size:0.9rem;">${c.type}</span>
+                    <span style="color:var(--accent-cyan); font-family:'JetBrains Mono', monospace; font-size:0.85rem;">${c.value}</span>
+                </a>
+            `).join('');
         }
 
-        // Profile Update Handler
-        function handleProfileUpdate(e) {
-            e.preventDefault();
-            let session = JSON.parse(localStorage.getItem(STORAGE_SESSION));
-            let users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
+        function renderProjects(filter) {
+            const projectsContainer = document.getElementById('projects-container');
+            const filtered = filter === 'all' 
+                ? SITE_CONFIG.projects 
+                : SITE_CONFIG.projects.filter(p => p.category === filter);
 
-            session.name = document.getElementById('input-edit-name').value.trim();
-            session.title = document.getElementById('input-edit-title').value.trim();
-            let customAvatar = document.getElementById('input-edit-avatar').value.trim();
-            if(customAvatar) session.avatar = customAvatar;
-
-            const idx = users.findIndex(u => u.email === session.email);
-            if (idx !== -1) users[idx] = session;
-
-            localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
-            localStorage.setItem(STORAGE_SESSION, JSON.stringify(session));
-            logActivity('Profil diperbarui oleh pengguna');
-            showToast('Profil berhasil diperbarui!', 'success');
-            renderApp();
-        }
-
-        // Logout
-        function handleLogout() {
-            logActivity('Sesi diakhiri (Logout)');
-            localStorage.removeItem(STORAGE_SESSION);
-            showToast('Anda telah keluar dari sistem.', 'info');
-            renderApp();
-        }
-
-        // Navigation View Router
-        function switchView(viewName, el) {
-            document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            if(el) el.classList.add('active');
-
-            const titles = {
-                overview: 'Overview Dashboard',
-                projects: 'Infrastruktur & Proyek Sistem',
-                profile: 'Pengaturan Profil Akun'
-            };
-            document.getElementById('topbar-title').textContent = titles[viewName] || 'Dashboard';
-        }
-
-        // Render Dynamic UI Elements
-        function renderApp() {
-            const session = JSON.parse(localStorage.getItem(STORAGE_SESSION));
-            const authWrapper = document.getElementById('auth-wrapper');
-            const appWrapper = document.getElementById('app-wrapper');
-
-            if (session) {
-                authWrapper.classList.add('hidden');
-                appWrapper.classList.remove('hidden');
-
-                // Sidebar Info
-                document.getElementById('sidebar-name').textContent = session.name;
-                document.getElementById('sidebar-email').textContent = session.email;
-                document.getElementById('sidebar-avatar').src = session.avatar;
-
-                // Profile Page Form Info
-                document.getElementById('profile-display-name').textContent = session.name;
-                document.getElementById('profile-display-email').textContent = session.email;
-                document.getElementById('profile-display-avatar').src = session.avatar;
-
-                document.getElementById('input-edit-name').value = session.name;
-                document.getElementById('input-edit-title').value = session.title || '';
-                document.getElementById('input-edit-avatar').value = session.avatar || '';
-
-                // Render Logs
-                const logs = JSON.parse(localStorage.getItem(STORAGE_LOGS) || '[]');
-                const logContainer = document.getElementById('activity-log-container');
-                if (logs.length === 0) {
-                    logContainer.innerHTML = '<div style="font-size:0.825rem; color:var(--text-dim);">Belum ada aktivitas tercatat.</div>';
-                } else {
-                    logContainer.innerHTML = logs.map(l => `
-                        <div class="activity-item">
-                            <span class="activity-desc">${l.desc}</span>
-                            <span class="activity-time">${l.time}</span>
+            projectsContainer.innerHTML = filtered.map(p => `
+                <div class="glass-panel project-card" onclick="openModal(${p.id})">
+                    <div class="project-thumb">
+                        <img src="https://picsum.photos/400/250?random=${p.id}" alt="${p.title}">
+                    </div>
+                    <div class="project-body">
+                        <div class="project-tags">
+                            ${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}
                         </div>
-                    `).join('');
-                }
-            } else {
-                appWrapper.classList.add('hidden');
-                authWrapper.classList.remove('hidden');
-            }
+                        <h3 style="font-size:1.1rem; font-weight:600;">${p.title}</h3>
+                        <p style="font-size:0.85rem; color:var(--text-muted);">${p.desc}</p>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // System Initialization on Load
-        (function initSystem() {
-            let users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
-            if (users.length === 0) {
-                users.push({
-                    email: 'kenzo@admin.io',
-                    password: 'admin123',
-                    name: 'Kenzo',
-                    title: 'Lead Cloud Architect',
-                    avatar: 'https://ui-avatars.com/api/?name=Kenzo&background=171b24&color=f3f4f6&bold=true'
-                });
-                localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
-                localStorage.setItem(STORAGE_LOGS, JSON.stringify([{ desc: 'Sistem diinisialisasi untuk pertama kali', time: new Date().toLocaleTimeString('id-ID') + ' WIB' }]));
-            }
-            renderApp();
-        })();
+        function filterProjects(category, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderProjects(category);
+        }
+
+        // Modal Handlers
+        function openModal(id) {
+            const p = SITE_CONFIG.projects.find(proj => proj.id === id);
+            if (!p) return;
+            document.getElementById('modal-title').textContent = p.title;
+            document.getElementById('modal-desc').textContent = p.desc;
+            document.getElementById('modal-tags').innerHTML = p.tags.map(t => `<span class="tag">${t}</span>`).join('');
+            document.getElementById('modal-actions').innerHTML = `
+                <a href="${p.github}" target="_blank" class="btn btn-outline" style="flex:1;">GitHub</a>
+                <a href="${p.demo}" target="_blank" class="btn btn-primary" style="flex:1;">Live Demo</a>
+            `;
+            document.getElementById('projectModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('projectModal').classList.remove('active');
+        }
+
+        // Navigation Mobile Menu Toggle
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('open');
+        }
+
+        // Contact Form Submission Handler
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('form-name').value;
+            alert(`Terima kasih, ${name}! Pesan Anda telah berhasil terkirim.`);
+            document.getElementById('contact-form').reset();
+        }
+
+        // Run Initialization
+        document.addEventListener('DOMContentLoaded', initWebsite);
     </script>
 </body>
 </html>

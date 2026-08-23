@@ -1,238 +1,563 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brat Generator High-Res (Multi-line, Case & Glow)</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            margin: 0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brat High-Res Graphic Studio</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        .container {
-            background-color: #1e1e1e;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
+  <style>
+    :root {
+      --bg-body: #090d16;
+      --bg-surface: #111827;
+      --bg-input: #0b0f17;
+      --border: #1f293d;
+      --border-focus: #8ace00;
+      
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      
+      --brat-green: #8ace00;
+      --brat-green-hover: #77b300;
+      
+      --radius-lg: 16px;
+      --radius-md: 10px;
+    }
 
-        h1 {
-            margin-top: 0;
-            color: #8ace00;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
 
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
+    body {
+      min-height: 100vh;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
 
-        textarea {
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #444;
-            background-color: #333;
-            color: white;
-            font-size: 16px;
-            resize: vertical;
-            min-height: 80px;
-        }
+    .app-header {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
 
-        .color-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        input[type="color"] {
-            cursor: pointer;
-            width: 50px;
-            height: 40px;
-            border: none;
-            border-radius: 4px;
-            background: none;
-        }
+    .brand-badge {
+      background: var(--brat-green);
+      color: #000;
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
 
-        .checkbox-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
+    .brand-title h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
 
-        button {
-            background-color: #8ace00;
-            color: black;
-            border: none;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
+    /* Main Studio Layout */
+    .studio-container {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
 
-        button:hover {
-            background-color: #75b000;
-        }
+    /* Left Panel Controls */
+    .controls-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
-        .preview {
-            margin-top: 20px;
-            border: 1px solid #444;
-            border-radius: 8px;
-            overflow: hidden;
-            background-image: linear-gradient(45deg, #333 25%, transparent 25%), 
-                              linear-gradient(-45deg, #333 25%, transparent 25%), 
-                              linear-gradient(45deg, transparent 75%, #333 75%), 
-                              linear-gradient(-45deg, transparent 75%, #333 75%);
-            background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-        }
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
 
-        canvas {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-    </style>
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-weight: 500;
+      outline: none;
+      resize: vertical;
+      min-height: 90px;
+      transition: border-color 0.15s ease;
+    }
+
+    textarea:focus {
+      border-color: var(--border-focus);
+    }
+
+    /* Color Swatches & Custom Picker */
+    .preset-swatches {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .swatch-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .swatch-btn:hover {
+      transform: scale(1.1);
+      border-color: #fff;
+    }
+
+    .swatch-brat { background-color: #8ace00; }
+    .swatch-white { background-color: #ffffff; }
+    .swatch-black { background-color: #000000; }
+    .swatch-red { background-color: #ff3b30; }
+
+    .color-picker-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+    }
+
+    .color-picker-row label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+    }
+
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    input[type="color"]::-webkit-color-swatch { border: 1px solid var(--border); border-radius: 6px; }
+
+    /* Segmented Controls (Case & Ratio) */
+    .segmented-control {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      gap: 4px;
+    }
+
+    .segmented-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 0;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .segmented-btn.active {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    /* Checkbox & Range Toggles */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+
+    .toggle-row span {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .toggle-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--brat-green);
+      cursor: pointer;
+    }
+
+    /* Download Primary Button */
+    .btn-download {
+      background: var(--brat-green);
+      color: #000;
+      border: none;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-download:hover {
+      background: var(--brat-green-hover);
+    }
+
+    .btn-download:active {
+      transform: scale(0.99);
+    }
+
+    /* Right Preview Panel */
+    .preview-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 520px;
+      position: sticky;
+      top: 24px;
+    }
+
+    .canvas-viewport {
+      width: 100%;
+      max-width: 440px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      /* Checkerboard Pattern for Transparency */
+      background-image: linear-gradient(45deg, #1f293d 25%, transparent 25%), 
+                        linear-gradient(-45deg, #1f293d 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #1f293d 75%), 
+                        linear-gradient(-45deg, transparent 75%, #1f293d 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    @media (max-width: 860px) {
+      .studio-container {
+        grid-template-columns: 1fr;
+      }
+      .preview-panel {
+        position: static;
+        min-height: auto;
+      }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Brat Generator</h1>
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="brand-title">
+      <span class="brand-badge">Brat</span>
+      <h1>Graphic Studio Pro</h1>
+    </div>
+  </header>
+
+  <!-- Studio Main -->
+  <main class="studio-container">
+    
+    <!-- Controls Panel -->
+    <div class="controls-panel">
+      
+      <!-- Text Input -->
+      <div class="control-group">
+        <div class="section-label">Teks Grafik</div>
+        <textarea id="textInput" placeholder="Ketik kalimat...">365 party girl</textarea>
+      </div>
+
+      <!-- Text Case Option -->
+      <div class="control-group">
+        <div class="section-label">Kapitalisasi Teks</div>
+        <div class="segmented-control">
+          <button class="segmented-btn active" id="caseLower" onclick="setCase('lower')">lowercase</button>
+          <button class="segmented-btn" id="caseRaw" onclick="setCase('raw')">As Typed</button>
+          <button class="segmented-btn" id="caseUpper" onclick="setCase('upper')">UPPERCASE</button>
+        </div>
+      </div>
+
+      <!-- Colors -->
+      <div class="control-group">
+        <div class="section-label">Warna Latar</div>
+        <div class="preset-swatches">
+          <button class="swatch-btn swatch-brat" title="Brat Green" onclick="setPresetColor('#8ace00')"></button>
+          <button class="swatch-btn swatch-white" title="Deluxe White" onclick="setPresetColor('#ffffff')"></button>
+          <button class="swatch-btn swatch-black" title="Dark Mode" onclick="setPresetColor('#000000')"></button>
+          <button class="swatch-btn swatch-red" title="Jubilee Red" onclick="setPresetColor('#ff3b30')"></button>
+        </div>
+        <div class="color-picker-row">
+          <label for="bgColor">Kustom Hex</label>
+          <input type="color" id="bgColor" value="#8ace00">
+        </div>
+      </div>
+
+      <!-- Aspect Ratio & Blur Effects -->
+      <div class="control-group">
+        <div class="section-label">Format & Efek Otentik</div>
         
-        <div class="controls">
-            <label for="textInput">Teks Kustom:</label>
-            <textarea id="textInput" placeholder="Ketik sesuatu...">Hello World</textarea>
-
-            <div class="color-row">
-                <label for="bgColor">Warna Latar:</label>
-                <input type="color" id="bgColor" value="#FFFFFF">
-            </div>
-
-            <label class="checkbox-row">
-                <input type="checkbox" id="transparentBg">
-                Latar Belakang Transparan
-            </label>
-
-            <button id="downloadBtn">Unduh Gambar (High-Res)</button>
+        <div class="segmented-control" style="grid-template-columns: 1fr 1fr; margin-bottom: 8px;">
+          <button class="segmented-btn active" id="ratioSquare" onclick="setRatio('1:1')">1:1 Square</button>
+          <button class="segmented-btn" id="ratioStory" onclick="setRatio('9:16')">9:16 Story</button>
         </div>
 
-        <div class="preview">
-            <canvas id="bratCanvas"></canvas>
-        </div>
+        <label class="toggle-row" style="margin-bottom: 8px;">
+          <span>Brat Blur Effect (Low-Res Look)</span>
+          <input type="checkbox" id="bratBlur" checked>
+        </label>
+
+        <label class="toggle-row">
+          <span>Latar Transparan (PNG Glow)</span>
+          <input type="checkbox" id="transparentBg">
+        </label>
+      </div>
+
+      <!-- Action Button -->
+      <button class="btn-download" id="downloadBtn">
+        <span>Unduh Gambar High-Res</span>
+      </button>
+
     </div>
 
-    <script>
-        const canvas = document.getElementById('bratCanvas');
-        const ctx = canvas.getContext('2d');
-        const textInput = document.getElementById('textInput');
-        const bgColor = document.getElementById('bgColor');
-        const transparentBg = document.getElementById('transparentBg');
-        const downloadBtn = document.getElementById('downloadBtn');
+    <!-- Preview Viewport Panel -->
+    <div class="preview-panel">
+      <div class="canvas-viewport">
+        <canvas id="bratCanvas"></canvas>
+      </div>
+    </div>
 
-        const CANVAS_SIZE = 1080;
-        canvas.width = CANVAS_SIZE;
-        canvas.height = CANVAS_SIZE;
+  </main>
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+  <script>
+    const canvas = document.getElementById('bratCanvas');
+    const ctx = canvas.getContext('2d');
 
-            // Jika transparan TIDAK dicentang, gambar background warna
-            if (!transparentBg.checked) {
-                ctx.fillStyle = bgColor.value;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Matikan efek glow untuk latar berwarna agar tetap otentik
-                ctx.shadowColor = 'transparent';
-                ctx.shadowBlur = 0;
-            } else {
-                // JIKA TRANSPARAN, AKTIFKAN EFEK GLOW
-                // Warna glow mengikuti warna background yang dipilih agar senada
-                ctx.shadowColor = bgColor.value; 
-                ctx.shadowBlur = 50; // Jarak pendaran cahaya
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
-            }
+    const textInput = document.getElementById('textInput');
+    const bgColor = document.getElementById('bgColor');
+    const transparentBg = document.getElementById('transparentBg');
+    const bratBlur = document.getElementById('bratBlur');
+    const downloadBtn = document.getElementById('downloadBtn');
 
-            const text = textInput.value || 'brat';
-            
-            ctx.fillStyle = '#000000';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
+    let textCaseState = 'lower'; // 'lower' | 'raw' | 'upper'
+    let currentAspectRatio = '1:1'; // '1:1' | '9:16'
 
-            let fontSize = 200; 
-            ctx.font = `normal ${fontSize}px Arial, Helvetica, sans-serif`;
-            
-            const maxWidth = canvas.width - 150; 
-            
-            const words = text.split(/\s+/);
-            let maxWordWidth = 0;
-            for (let word of words) {
-                let width = ctx.measureText(word).width;
-                if (width > maxWordWidth) {
-                    maxWordWidth = width;
-                }
-            }
+    function updateCanvasDimensions() {
+      if (currentAspectRatio === '1:1') {
+        canvas.width = 1080;
+        canvas.height = 1080;
+      } else {
+        canvas.width = 1080;
+        canvas.height = 1920;
+      }
+    }
 
-            if (maxWordWidth > maxWidth) {
-                fontSize = fontSize * (maxWidth / maxWordWidth);
-                ctx.font = `normal ${fontSize}px Arial, Helvetica, sans-serif`;
-            }
+    function getFormattedText() {
+      const rawText = textInput.value || 'brat';
+      if (textCaseState === 'lower') return rawText.toLowerCase();
+      if (textCaseState === 'upper') return rawText.toUpperCase();
+      return rawText;
+    }
 
-            let lines = [];
-            let currentLine = words[0] || '';
+    function draw() {
+      updateCanvasDimensions();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            for (let i = 1; i < words.length; i++) {
-                let word = words[i];
-                let width = ctx.measureText(currentLine + " " + word).width;
-                if (width < maxWidth) {
-                    currentLine += " " + word;
-                } else {
-                    lines.push(currentLine);
-                    currentLine = word;
-                }
-            }
-            if (currentLine) {
-                lines.push(currentLine);
-            }
+      // Background Rendering
+      if (!transparentBg.checked) {
+        ctx.fillStyle = bgColor.value;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+      } else {
+        // Glow effect when background is transparent
+        ctx.shadowColor = bgColor.value;
+        ctx.shadowBlur = 40;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+      }
 
-            const lineHeight = fontSize * 1.1; 
-            const totalTextHeight = (lines.length - 1) * lineHeight;
-            const startY = (canvas.height / 2) - (totalTextHeight / 2);
+      // Authentic Brat Font & Text Properties
+      // Determine text color (Black for light backgrounds, White for dark backgrounds)
+      const isDarkBg = isColorDark(bgColor.value) && !transparentBg.checked;
+      ctx.fillStyle = isDarkBg ? '#ffffff' : '#000000';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
 
-            for (let i = 0; i < lines.length; i++) {
-                // Teks digambar dengan efek glow aktif jika latar transparan
-                ctx.fillText(lines[i], canvas.width / 2, startY + (i * lineHeight));
-            }
+      // Apply subtle Brat Blur filter if enabled
+      if (bratBlur.checked) {
+        ctx.filter = 'blur(2.5px)';
+      } else {
+        ctx.filter = 'none';
+      }
+
+      const text = getFormattedText();
+      const maxWidth = canvas.width - 180;
+      const words = text.split(/\s+/);
+
+      // Dynamic Font Scaling Logic
+      let fontSize = 190;
+      ctx.font = `500 ${fontSize}px Arial, "Helvetica Neue", Helvetica, sans-serif`;
+
+      let maxWordWidth = 0;
+      for (let word of words) {
+        let w = ctx.measureText(word).width;
+        if (w > maxWordWidth) maxWordWidth = w;
+      }
+
+      if (maxWordWidth > maxWidth) {
+        fontSize = fontSize * (maxWidth / maxWordWidth);
+        ctx.font = `500 ${fontSize}px Arial, "Helvetica Neue", Helvetica, sans-serif`;
+      }
+
+      // Word Wrap
+      let lines = [];
+      let currentLine = words[0] || '';
+
+      for (let i = 1; i < words.length; i++) {
+        let word = words[i];
+        let width = ctx.measureText(currentLine + " " + word).width;
+        if (width < maxWidth) {
+          currentLine += " " + word;
+        } else {
+          lines.push(currentLine);
+          currentLine = word;
         }
+      }
+      if (currentLine) lines.push(currentLine);
 
-        textInput.addEventListener('input', draw);
-        bgColor.addEventListener('input', draw);
-        transparentBg.addEventListener('change', draw);
+      // Render Text Stack
+      const lineHeight = fontSize * 1.05;
+      const totalTextHeight = (lines.length - 1) * lineHeight;
+      const startY = (canvas.height / 2) - (totalTextHeight / 2);
 
-        downloadBtn.addEventListener('click', () => {
-            const link = document.createElement('a');
-            let fileName = textInput.value.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 15) || 'custom';
-            link.download = `brat-${fileName}.png`;
-            link.href = canvas.toDataURL('image/png', 1.0);
-            link.click();
-        });
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], canvas.width / 2, startY + (i * lineHeight));
+      }
+    }
 
-        // Gambar pertama kali saat halaman dimuat
-        draw();
-    </script>
+    // Color Luminance Helper for auto text contrast
+    function isColorDark(hex) {
+      const c = hex.replace('#', '');
+      const rgb = parseInt(c, 16);
+      const r = (rgb >> 16) & 0xff;
+      const g = (rgb >> 8) & 0xff;
+      const b = (rgb >> 0) & 0xff;
+      const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      return luma < 120;
+    }
+
+    // Control Handlers
+    function setCase(c) {
+      textCaseState = c;
+      document.querySelectorAll('#caseLower, #caseRaw, #caseUpper').forEach(b => b.classList.remove('active'));
+      if (c === 'lower') document.getElementById('caseLower').classList.add('active');
+      if (c === 'raw') document.getElementById('caseRaw').classList.add('active');
+      if (c === 'upper') document.getElementById('caseUpper').classList.add('active');
+      draw();
+    }
+
+    function setRatio(r) {
+      currentAspectRatio = r;
+      document.querySelectorAll('#ratioSquare, #ratioStory').forEach(b => b.classList.remove('active'));
+      if (r === '1:1') document.getElementById('ratioSquare').classList.add('active');
+      if (r === '9:16') document.getElementById('ratioStory').classList.add('active');
+      draw();
+    }
+
+    function setPresetColor(hex) {
+      bgColor.value = hex;
+      draw();
+    }
+
+    // Event Listeners
+    textInput.addEventListener('input', draw);
+    bgColor.addEventListener('input', draw);
+    transparentBg.addEventListener('change', draw);
+    bratBlur.addEventListener('change', draw);
+
+    downloadBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      let cleanName = textInput.value.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 15).toLowerCase() || 'brat';
+      link.download = `brat-${cleanName}-${currentAspectRatio === '1:1' ? 'square' : 'story'}.png`;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      link.click();
+    });
+
+    // Initial Render
+    draw();
+  </script>
 </body>
 </html>

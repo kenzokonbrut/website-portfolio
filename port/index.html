@@ -3,346 +3,690 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executive Portal | Kenzo</title>
+    <title>Kenzo | Executive Tech Portfolio & System Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #090d16;
-            --card-bg: rgba(19, 26, 41, 0.75);
+            --bg-body: #06090e;
+            --bg-surface: rgba(15, 23, 42, 0.75);
+            --bg-card: rgba(26, 36, 56, 0.6);
+            --bg-input: rgba(10, 15, 26, 0.8);
+            
             --border: rgba(255, 255, 255, 0.08);
-            --accent-blue: #38bdf8;
-            --accent-purple: #818cf8;
+            --border-hover: rgba(56, 189, 248, 0.4);
+            
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.25);
+            --purple: #818cf8;
+            --emerald: #34d399;
+            --rose: #fb7185;
+            
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --danger: #f87171;
+            --text-dim: #64748b;
+            
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 10px;
         }
 
         * {
             margin: 0; padding: 0; box-sizing: border-box;
             font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-body);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
             background-image: 
-                radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
-                radial-gradient(circle at 90% 90%, rgba(129, 140, 248, 0.1) 0%, transparent 40%);
+                radial-gradient(circle at 10% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 85%, rgba(129, 140, 248, 0.08) 0%, transparent 40%);
         }
+
+        /* Toast Notification */
+        #toast-container {
+            position: fixed; top: 24px; right: 24px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+
+        .toast {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            backdrop-filter: blur(12px);
+            padding: 14px 20px; border-radius: var(--radius-sm);
+            color: var(--text-main); font-size: 0.88rem; font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast.show { transform: translateX(0); }
+        .toast.error { border-left-color: var(--rose); }
+        .toast.success { border-left-color: var(--emerald); }
 
         .hidden { display: none !important; }
 
-        /* --- AUTH CARD --- */
-        .auth-container {
-            width: 100%; max-width: 440px; padding: 20px;
+        /* --- AUTH SECTION --- */
+        .auth-wrapper {
+            width: 100%; max-width: 440px; padding: 20px; z-index: 10;
         }
 
         .auth-card {
-            background: var(--card-bg);
+            background: var(--bg-surface);
             backdrop-filter: blur(20px);
             border: 1px solid var(--border);
-            border-radius: 24px;
+            border-radius: var(--radius-lg);
             padding: 36px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
 
-        .brand-header {
-            text-align: center; margin-bottom: 28px;
-        }
-
-        .brand-logo {
-            width: 50px; height: 50px;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+        .auth-brand { text-align: center; margin-bottom: 24px; }
+        .auth-brand .logo {
+            width: 52px; height: 52px;
+            background: linear-gradient(135deg, var(--primary), var(--purple));
             border-radius: 14px; display: inline-flex;
             align-items: center; justify-content: center;
-            font-weight: 800; font-size: 22px; color: #fff; margin-bottom: 12px;
+            font-size: 1.5rem; font-weight: 800; color: #fff;
+            box-shadow: 0 8px 20px var(--primary-glow); margin-bottom: 12px;
         }
 
-        .tabs {
-            display: flex; background: rgba(0,0,0,0.3);
-            border-radius: 12px; padding: 4px; margin-bottom: 24px;
+        .auth-brand h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+        .auth-brand p { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
+
+        .auth-tabs {
+            display: flex; background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-sm); padding: 4px; margin-bottom: 20px;
         }
 
-        .tab-btn {
+        .auth-tab-btn {
             flex: 1; padding: 10px; border: none; background: transparent;
             color: var(--text-muted); font-weight: 600; font-size: 0.85rem;
             border-radius: 8px; cursor: pointer; transition: 0.2s;
         }
 
-        .tab-btn.active {
-            background: rgba(255, 255, 255, 0.1); color: #fff;
+        .auth-tab-btn.active {
+            background: rgba(255, 255, 255, 0.1); color: var(--text-main);
         }
-
-        .btn-google {
-            width: 100%; padding: 12px;
-            background: #ffffff; color: #0f172a;
-            border: none; border-radius: 12px; font-weight: 600; font-size: 0.9rem;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            cursor: pointer; transition: 0.2s; margin-bottom: 20px;
-        }
-
-        .btn-google:hover { background: #f1f5f9; }
-
-        .divider {
-            display: flex; align-items: center; text-align: center;
-            color: var(--text-muted); font-size: 0.75rem; margin-bottom: 20px;
-        }
-        .divider::before, .divider::after {
-            content: ''; flex: 1; border-bottom: 1px solid var(--border);
-        }
-        .divider span { padding: 0 10px; }
 
         .input-group { margin-bottom: 16px; text-align: left; }
         .input-group label {
-            display: block; font-size: 0.75rem; font-weight: 600;
-            color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;
-        }
-        .input-group input {
-            width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--border); border-radius: 10px; color: #fff;
-            font-size: 0.9rem; outline: none; transition: 0.2s;
-        }
-        .input-group input:focus { border-color: var(--accent-blue); }
-
-        .btn-submit {
-            width: 100%; padding: 12px;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-            border: none; border-radius: 10px; color: #fff; font-weight: 700;
-            cursor: pointer; transition: opacity 0.2s; margin-top: 8px;
-        }
-        .btn-submit:hover { opacity: 0.9; }
-
-        .error-msg {
-            color: var(--danger); font-size: 0.8rem; text-align: center;
-            margin-top: 12px; min-height: 18px;
+            display: block; font-size: 0.75rem; font-weight: 700;
+            color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;
+            margin-bottom: 6px;
         }
 
-        /* --- DASHBOARD & PROFILE VIEW --- */
+        .input-group input, .input-group textarea {
+            width: 100%; padding: 12px 16px; background: var(--bg-input);
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            color: var(--text-main); font-size: 0.9rem; outline: none; transition: 0.2s;
+        }
+
+        .input-group input:focus, .input-group textarea:focus { border-color: var(--primary); }
+
+        .btn {
+            width: 100%; padding: 13px; border: none; border-radius: var(--radius-sm);
+            font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            color: #fff; box-shadow: 0 4px 15px var(--primary-glow);
+        }
+        .btn-primary:hover { opacity: 0.92; }
+
+        .btn-demo {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
+            color: var(--text-muted); margin-top: 10px;
+        }
+        .btn-demo:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+        /* --- MAIN DASHBOARD APP --- */
         .app-container {
-            width: 100%; max-width: 1000px; padding: 30px 20px;
+            width: 100%; max-width: 1100px; padding: 40px 20px;
+            display: flex; flex-direction: column; gap: 32px;
         }
 
+        /* Navbar */
         nav {
             display: flex; justify-content: space-between; align-items: center;
-            background: var(--card-bg); backdrop-filter: blur(15px);
-            border: 1px solid var(--border); padding: 12px 24px; border-radius: 100px;
-            margin-bottom: 30px;
+            background: var(--bg-surface); backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: 100px;
+            padding: 10px 24px;
         }
 
-        .user-pill {
-            display: flex; align-items: center; gap: 12px;
+        .nav-left { display: flex; align-items: center; gap: 16px; }
+        .nav-logo { font-weight: 800; font-size: 1.1rem; color: var(--primary); }
+
+        .nav-menu { display: flex; gap: 8px; }
+        .nav-item {
+            padding: 8px 16px; border-radius: 100px; font-size: 0.85rem; font-weight: 600;
+            color: var(--text-muted); background: transparent; border: none; cursor: pointer;
+            transition: 0.2s;
         }
-        .user-avatar {
+        .nav-item.active, .nav-item:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+        .user-nav-profile {
+            display: flex; align-items: center; gap: 12px; cursor: pointer;
+        }
+
+        .user-avatar-sm {
             width: 36px; height: 36px; border-radius: 50%;
-            object-fit: cover; border: 2px solid var(--accent-blue);
+            object-fit: cover; border: 2px solid var(--primary);
         }
 
-        .btn-logout {
-            background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.2);
-            color: var(--danger); padding: 8px 16px; border-radius: 100px;
-            cursor: pointer; font-weight: 600; font-size: 0.8rem; transition: 0.2s;
+        .btn-logout-icon {
+            background: rgba(251, 113, 133, 0.1); border: 1px solid rgba(251, 113, 133, 0.2);
+            color: var(--rose); padding: 8px 14px; border-radius: 100px;
+            font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s;
         }
-        .btn-logout:hover { background: rgba(248, 113, 113, 0.2); }
+        .btn-logout-icon:hover { background: rgba(251, 113, 133, 0.2); }
 
-        .profile-card {
-            background: var(--card-bg); border: 1px solid var(--border);
-            border-radius: 20px; padding: 28px; margin-bottom: 30px;
-            display: flex; align-items: center; gap: 24px;
-        }
-
-        .profile-card img {
-            width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--accent-purple);
+        /* Header / Banner */
+        .hero-banner {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 36px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 24px; position: relative; overflow: hidden;
         }
 
-        .profile-info h2 { font-size: 1.4rem; font-weight: 700; }
-        .profile-info p { color: var(--text-muted); font-size: 0.9rem; margin-top: 2px; }
-        .badge-provider {
-            display: inline-block; padding: 2px 10px; background: rgba(56, 189, 248, 0.15);
-            color: var(--accent-blue); border-radius: 20px; font-size: 0.75rem;
-            font-weight: 700; margin-top: 8px; text-transform: uppercase;
+        .hero-info { max-width: 650px; }
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 4px 12px; background: rgba(52, 211, 153, 0.1);
+            border: 1px solid rgba(52, 211, 153, 0.3); border-radius: 100px;
+            color: var(--emerald); font-size: 0.75rem; font-weight: 700; margin-bottom: 16px;
+        }
+        .status-dot { width: 8px; height: 8px; background: var(--emerald); border-radius: 50%; }
+
+        .hero-info h1 { font-size: 2.2rem; font-weight: 800; line-height: 1.2; margin-bottom: 8px; }
+        .hero-info p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+
+        .user-card-header {
+            display: flex; align-items: center; gap: 20px;
+            background: rgba(0,0,0,0.3); padding: 16px 20px; border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        .user-avatar-lg {
+            width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+            border: 3px solid var(--purple);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 20px;
+        }
+        .stat-card .label { color: var(--text-muted); font-size: 0.8rem; font-weight: 600; }
+        .stat-card .value { font-size: 1.8rem; font-weight: 800; color: var(--primary); margin: 6px 0 2px; }
+        .stat-card .desc { font-size: 0.75rem; color: var(--text-dim); }
+
+        /* Content Views */
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .section-title { font-size: 1.3rem; font-weight: 800; }
+
+        .filter-tabs { display: flex; gap: 8px; }
+        .filter-btn {
+            background: var(--bg-card); border: 1px solid var(--border);
+            color: var(--text-muted); padding: 6px 14px; border-radius: 100px;
+            font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s;
+        }
+        .filter-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
+
+        .projects-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;
+        }
+
+        .project-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 24px; transition: all 0.3s ease;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .project-card:hover {
+            transform: translateY(-4px); border-color: var(--border-hover);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-tag {
+            font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+            color: var(--purple); letter-spacing: 0.05em; margin-bottom: 8px;
+        }
+
+        .project-card h3 { font-size: 1.15rem; margin-bottom: 8px; }
+        .project-card p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 16px; }
+
+        .tech-pill-group { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tech-pill {
+            background: rgba(255, 255, 255, 0.05); padding: 4px 10px;
+            border-radius: 6px; font-size: 0.72rem; color: var(--text-muted); font-weight: 600;
+        }
+
+        /* Profile Editor Section */
+        .profile-editor-card {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 32px; max-width: 600px; margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .hero-banner { flex-direction: column; align-items: flex-start; }
+            nav { padding: 8px 16px; }
+            .nav-menu { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. AUTHENTICATION SECTION -->
-    <div id="auth-view" class="auth-container">
+    <!-- Toast Notifications -->
+    <div id="toast-container"></div>
+
+    <!-- 1. AUTHENTICATION VIEW -->
+    <div id="auth-view" class="auth-wrapper">
         <div class="auth-card">
-            <div class="brand-header">
-                <div class="brand-logo">K</div>
-                <h2 id="auth-title">Selamat Datang</h2>
+            <div class="auth-brand">
+                <div class="logo">K</div>
+                <h2 id="auth-header-title">Sistem Portal Login</h2>
+                <p>Masuk untuk mengakses dasbor portofolio eksekutif.</p>
             </div>
 
-            <div class="tabs">
-                <button class="tab-btn active" id="tab-login">Login</button>
-                <button class="tab-btn" id="tab-signup">Sign Up</button>
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" id="tab-login" onclick="switchAuthTab('login')">Login</button>
+                <button class="auth-tab-btn" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
             </div>
 
-            <button class="btn-google" id="btn-google">
-                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-                Lanjutkan dengan Google
-            </button>
-
-            <div class="divider"><span>ATAU</span></div>
-
-            <form id="auth-form">
-                <div class="input-group hidden" id="group-name">
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+                <div class="input-group hidden" id="group-fullname">
                     <label>Nama Lengkap</label>
-                    <input type="text" id="input-name" placeholder="Kenzo">
+                    <input type="text" id="input-fullname" placeholder="Masukkan nama Anda">
                 </div>
                 <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" id="input-email" placeholder="nama@email.com" required>
+                    <label>Email Address</label>
+                    <input type="email" id="input-email" placeholder="kenzo@admin.com" required>
                 </div>
                 <div class="input-group">
                     <label>Password</label>
                     <input type="password" id="input-password" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn-submit" id="btn-submit">Masuk</button>
+
+                <button type="submit" class="btn btn-primary" id="btn-submit-auth">Masuk ke Portal</button>
             </form>
 
-            <div class="error-msg" id="error-msg"></div>
+            <button class="btn btn-demo" onclick="useDemoAccount()">⚡ Masuk Mode Demo Instan</button>
         </div>
     </div>
 
-    <!-- 2. DASHBOARD & PROFILE SECTION -->
+    <!-- 2. MAIN DASHBOARD VIEW -->
     <div id="dashboard-view" class="app-container hidden">
+        <!-- Navigation -->
         <nav>
-            <div class="user-pill">
-                <img src="" id="nav-avatar" class="user-avatar" alt="User">
-                <span id="nav-name" style="font-weight: 700;">Loading...</span>
+            <div class="nav-left">
+                <span class="nav-logo">KENZO.IO</span>
+                <div class="nav-menu">
+                    <button class="nav-item active" onclick="switchView('overview')">Overview</button>
+                    <button class="nav-item" onclick="switchView('projects')">Proyek</button>
+                    <button class="nav-item" onclick="switchView('profile')">Pengaturan Profil</button>
+                </div>
             </div>
-            <button class="btn-logout" id="btn-logout">Keluar</button>
+
+            <div class="user-nav-profile" onclick="switchView('profile')">
+                <img src="" id="nav-avatar" class="user-avatar-sm" alt="Avatar">
+                <button class="btn-logout-icon" onclick="handleLogout(event)">Keluar</button>
+            </div>
         </nav>
 
-        <!-- Profile Card -->
-        <div class="profile-card">
-            <img src="" id="profile-img" alt="Avatar">
-            <div class="profile-info">
-                <h2 id="profile-name">-</h2>
-                <p id="profile-email">-</p>
-                <span class="badge-provider" id="profile-provider">Email & Password</span>
+        <!-- VIEW: OVERVIEW -->
+        <div id="view-overview" class="view-content">
+            <!-- Hero Banner -->
+            <div class="hero-banner">
+                <div class="hero-info">
+                    <div class="status-pill">
+                        <span class="status-dot"></span> System Operational • All Systems Green
+                    </div>
+                    <h1>Selamat Datang Kembali, <span id="dash-user-firstname" style="color:var(--primary);">Kenzo</span></h1>
+                    <p id="dash-user-bio">Tech Architect & Systems Specialist. Fokus pada manajemen infrastruktur server performa tinggi dan otomatisasi bot pintar.</p>
+                </div>
+
+                <div class="user-card-header">
+                    <img src="" id="dash-user-avatar" class="user-avatar-lg" alt="User Avatar">
+                    <div>
+                        <h4 id="dash-user-fullname" style="font-weight: 800;">-</h4>
+                        <p id="dash-user-email" style="font-size: 0.8rem; color: var(--text-muted);">-</p>
+                        <span style="display:inline-block; margin-top:6px; font-size:0.7rem; font-weight:700; color:var(--emerald); background:rgba(52,211,153,0.15); padding:2px 8px; border-radius:4px;">VERIFIED ADMIN</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Monitor -->
+            <div class="stats-grid" style="margin-top:24px;">
+                <div class="stat-card">
+                    <div class="label">Server Uptime Rate</div>
+                    <div class="value">99.98%</div>
+                    <div class="desc">Monitoring Pterodactyl Clusters</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Bot Active Sessions</div>
+                    <div class="value">12 Nodes</div>
+                    <div class="desc">WhatsApp & REST API Integrations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">System CPU Load</div>
+                    <div class="value">14.2%</div>
+                    <div class="desc">Optimal Performance</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Authentication Engine</div>
+                    <div class="value">Active</div>
+                    <div class="desc">Encrypted Local Storage Engine</div>
+                </div>
             </div>
         </div>
 
-        <h3 style="margin-bottom: 16px;">Portofolio & Project Akses</h3>
-        <p style="color: var(--text-muted); line-height: 1.6;">
-            Selamat datang di area privat. Akun Anda telah terverifikasi secara aman menggunakan otentikasi terenkripsi.
-        </p>
+        <!-- VIEW: PROJECTS -->
+        <div id="view-projects" class="view-content hidden">
+            <div class="section-header">
+                <h2 class="section-title">Portofolio & Infrastruktur</h2>
+                <div class="filter-tabs">
+                    <button class="filter-btn active" onclick="filterProjects('all', this)">Semua</button>
+                    <button class="filter-btn" onclick="filterProjects('server', this)">Server</button>
+                    <button class="filter-btn" onclick="filterProjects('bot', this)">Bot Automation</button>
+                </div>
+            </div>
+
+            <div class="projects-grid">
+                <div class="project-card" data-cat="server">
+                    <div>
+                        <span class="project-tag">Infrastructure</span>
+                        <h3>Pterodactyl Game Panel Manager</h3>
+                        <p>Sistem manajemen server game otomatis dengan integrasi auto-deployment, resource allocation, dan payment gateway API.</p>
+                    </div>
+                    <div class="tech-pill-group">
+                        <span class="tech-pill">Docker</span>
+                        <span class="tech-pill">Pterodactyl</span>
+                        <span class="tech-pill">Linux</span>
+                        <span class="tech-pill">Node.js</span>
+                    </div>
+                </div>
+
+                <div class="project-card" data-cat="bot">
+                    <div>
+                        <span class="project-tag">Automation</span>
+                        <h3>WhatsApp Enterprise Bot System</h3>
+                        <p>Bot layanan otomatisasi multi-session untuk pemrosesan transaksi real-time, broadcast notifikasi, dan verifikasi pengguna.</p>
+                    </div>
+                    <div class="tech-pill-group">
+                        <span class="tech-pill">JavaScript</span>
+                        <span class="tech-pill">Baileys API</span>
+                        <span class="tech-pill">RESTful API</span>
+                    </div>
+                </div>
+
+                <div class="project-card" data-cat="server">
+                    <div>
+                        <span class="project-tag">Control Center</span>
+                        <h3>Executive Monitoring Dashboard</h3>
+                        <p>Antarmuka manajemen terpusat dengan efek Glassmorphism untuk memantau load server, statistik bot, dan manajemen akun pengguna.</p>
+                    </div>
+                    <div class="tech-pill-group">
+                        <span class="tech-pill">HTML5/CSS3</span>
+                        <span class="tech-pill">Vanilla JS</span>
+                        <span class="tech-pill">SPA Architecture</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: PROFILE SETTINGS -->
+        <div id="view-profile" class="view-content hidden">
+            <div class="profile-editor-card">
+                <h2 style="font-size:1.4rem; font-weight:800; margin-bottom:8px;">Pengaturan Profil Akun</h2>
+                <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:24px;">Perbarui data profil Anda. Perubahan akan langsung tersimpan secara lokal.</p>
+
+                <form onsubmit="handleProfileUpdate(event)">
+                    <div class="input-group">
+                        <label>Nama Lengkap</label>
+                        <input type="text" id="edit-fullname" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Jabatan / Title</label>
+                        <input type="text" id="edit-title" placeholder="Contoh: CEO & Tech Architect">
+                    </div>
+                    <div class="input-group">
+                        <label>URL foto Profil (Avatar)</label>
+                        <input type="text" id="edit-avatar" placeholder="https://...">
+                    </div>
+                    <div class="input-group">
+                        <label>Bio Singkat</label>
+                        <textarea id="edit-bio" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan Profil</button>
+                </form>
+            </div>
+        </div>
     </div>
 
-    <!-- Firebase SDK v10 -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { 
-            getAuth, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            GoogleAuthProvider, 
-            signInWithPopup, 
-            signOut, 
-            onAuthStateChanged,
-            updateProfile 
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    <script>
+        // --- LOCAL STORAGE AUTH & APP ENGINE ---
+        const DB_KEY_USERS = 'kenzo_portal_users';
+        const DB_KEY_SESSION = 'kenzo_portal_session';
 
-        // ⚠️ GANTI DENGAN FIREBASE CONFIG ANDA DARI FIREBASE CONSOLE
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+        let currentAuthMode = 'login'; // 'login' | 'signup'
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const googleProvider = new GoogleAuthProvider();
-
-        // Elements
-        const authView = document.getElementById('auth-view');
-        const dashboardView = document.getElementById('dashboard-view');
-        const tabLogin = document.getElementById('tab-login');
-        const tabSignup = document.getElementById('tab-signup');
-        const groupName = document.getElementById('group-name');
-        const btnSubmit = document.getElementById('btn-submit');
-        const authForm = document.getElementById('auth-form');
-        const errorMsg = document.getElementById('error-msg');
-        
-        let isLoginState = true;
-
-        // Toggle Tabs
-        tabLogin.addEventListener('click', () => {
-            isLoginState = true;
-            tabLogin.classList.add('active'); tabSignup.classList.remove('active');
-            groupName.classList.add('hidden'); btnSubmit.textContent = "Masuk";
-            errorMsg.textContent = "";
-        });
-
-        tabSignup.addEventListener('click', () => {
-            isLoginState = false;
-            tabSignup.classList.add('active'); tabLogin.classList.remove('active');
-            groupName.classList.remove('hidden'); btnSubmit.textContent = "Daftar Akun";
-            errorMsg.textContent = "";
-        });
-
-        // Email/Password Submit Handler
-        authForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            errorMsg.textContent = "";
-            const email = document.getElementById('input-email').value;
-            const password = document.getElementById('input-password').value;
-            const name = document.getElementById('input-name').value;
-
-            try {
-                if (isLoginState) {
-                    await signInWithEmailAndPassword(auth, email, password);
-                } else {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    await updateProfile(userCredential.user, { displayName: name });
-                }
-            } catch (err) {
-                errorMsg.textContent = err.message.replace("Firebase: ", "");
+        // Initialize default user if empty
+        function initDB() {
+            const users = JSON.parse(localStorage.getItem(DB_KEY_USERS) || '[]');
+            if (users.length === 0) {
+                const defaultUser = {
+                    email: 'kenzo@admin.com',
+                    password: 'admin123',
+                    fullname: 'Kenzo',
+                    title: 'CEO & Tech Architect',
+                    bio: 'Fokus pada pengelolaan server performa tinggi, bot otomatisasi pintar, dan ekosistem digital yang scalable.',
+                    avatar: 'https://ui-avatars.com/api/?name=Kenzo&background=38bdf8&color=000&bold=true'
+                };
+                users.push(defaultUser);
+                localStorage.setItem(DB_KEY_USERS, JSON.stringify(users));
             }
-        });
+        }
 
-        // Google Sign In Handler
-        document.getElementById('btn-google').addEventListener('click', async () => {
-            try {
-                await signInWithPopup(auth, googleProvider);
-            } catch (err) {
-                errorMsg.textContent = err.message.replace("Firebase: ", "");
-            }
-        });
+        // Show Toasts
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
 
-        // Logout Handler
-        document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
+            setTimeout(() => toast.classList.add('show'), 50);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
-        // Realtime Auth State Listener
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // User logged in
-                authView.classList.add('hidden');
-                dashboardView.classList.remove('hidden');
+        // Auth Tabs Toggle
+        function switchAuthTab(mode) {
+            currentAuthMode = mode;
+            const groupName = document.getElementById('group-fullname');
+            const btnSubmit = document.getElementById('btn-submit-auth');
+            const tabLogin = document.getElementById('tab-login');
+            const tabSignup = document.getElementById('tab-signup');
 
-                const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || user.email)}&background=38bdf8&color=fff`;
-
-                document.getElementById('nav-avatar').src = user.photoURL || defaultAvatar;
-                document.getElementById('profile-img').src = user.photoURL || defaultAvatar;
-                document.getElementById('nav-name').textContent = user.displayName || 'User';
-                document.getElementById('profile-name').textContent = user.displayName || 'User Executive';
-                document.getElementById('profile-email').textContent = user.email;
-                document.getElementById('profile-provider').textContent = user.providerData[0]?.providerId === 'google.com' ? 'Google Account' : 'Email & Password';
+            if (mode === 'signup') {
+                groupName.classList.remove('hidden');
+                btnSubmit.textContent = 'Daftar Akun Baru';
+                tabSignup.classList.add('active');
+                tabLogin.classList.remove('active');
             } else {
-                // User logged out
-                dashboardView.classList.add('hidden');
+                groupName.classList.add('hidden');
+                btnSubmit.textContent = 'Masuk ke Portal';
+                tabLogin.classList.add('active');
+                tabSignup.classList.remove('active');
+            }
+        }
+
+        // Auth Submit Handler
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('input-email').value.trim();
+            const password = document.getElementById('input-password').value.trim();
+            const fullname = document.getElementById('input-fullname').value.trim();
+
+            const users = JSON.parse(localStorage.getItem(DB_KEY_USERS) || '[]');
+
+            if (currentAuthMode === 'signup') {
+                // Register logic
+                const exists = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+                if (exists) {
+                    showToast('Email sudah terdaftar! Gunakan email lain.', 'error');
+                    return;
+                }
+
+                const newUser = {
+                    email,
+                    password,
+                    fullname: fullname || email.split('@')[0],
+                    title: 'System Member',
+                    bio: 'Pengguna terverifikasi pada sistem portal.',
+                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullname || email)}&background=818cf8&color=fff`
+                };
+
+                users.push(newUser);
+                localStorage.setItem(DB_KEY_USERS, JSON.stringify(users));
+                localStorage.setItem(DB_KEY_SESSION, JSON.stringify(newUser));
+                
+                showToast('Akun berhasil dibuat!', 'success');
+                renderApp();
+            } else {
+                // Login logic
+                const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+                if (user) {
+                    localStorage.setItem(DB_KEY_SESSION, JSON.stringify(user));
+                    showToast('Login berhasil. Selamat datang!', 'success');
+                    renderApp();
+                } else {
+                    showToast('Email atau Password salah!', 'error');
+                }
+            }
+        }
+
+        // Quick Demo Login
+        function useDemoAccount() {
+            document.getElementById('input-email').value = 'kenzo@admin.com';
+            document.getElementById('input-password').value = 'admin123';
+            switchAuthTab('login');
+            showToast('Kredensial Demo diisi!', 'info');
+        }
+
+        // Logout
+        function handleLogout(e) {
+            if(e) e.stopPropagation();
+            localStorage.removeItem(DB_KEY_SESSION);
+            showToast('Anda telah keluar.', 'info');
+            renderApp();
+        }
+
+        // Profile Update Handler
+        function handleProfileUpdate(e) {
+            e.preventDefault();
+            const session = JSON.parse(localStorage.getItem(DB_KEY_SESSION));
+            if (!session) return;
+
+            const fullname = document.getElementById('edit-fullname').value.trim();
+            const title = document.getElementById('edit-title').value.trim();
+            const avatar = document.getElementById('edit-avatar').value.trim();
+            const bio = document.getElementById('edit-bio').value.trim();
+
+            session.fullname = fullname;
+            session.title = title;
+            session.avatar = avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullname)}&background=38bdf8&color=000`;
+            session.bio = bio;
+
+            // Update in users array
+            const users = JSON.parse(localStorage.getItem(DB_KEY_USERS) || '[]');
+            const idx = users.findIndex(u => u.email === session.email);
+            if (idx !== -1) users[idx] = session;
+
+            localStorage.setItem(DB_KEY_USERS, JSON.stringify(users));
+            localStorage.setItem(DB_KEY_SESSION, JSON.stringify(session));
+
+            showToast('Profil berhasil diperbarui!', 'success');
+            renderApp();
+        }
+
+        // Navigation Switcher
+        function switchView(viewName) {
+            document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+
+            const activeNav = Array.from(document.querySelectorAll('.nav-item')).find(btn => btn.getAttribute('onclick').includes(viewName));
+            if (activeNav) activeNav.classList.add('active');
+        }
+
+        // Project Filter
+        function filterProjects(category, btnEl) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            btnEl.classList.add('active');
+
+            document.querySelectorAll('.project-card').forEach(card => {
+                if (category === 'all' || card.dataset.cat === category) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        // Main App Render Loop
+        function renderApp() {
+            initDB();
+            const session = JSON.parse(localStorage.getItem(DB_KEY_SESSION));
+
+            const authView = document.getElementById('auth-view');
+            const dashView = document.getElementById('dashboard-view');
+
+            if (session) {
+                authView.classList.add('hidden');
+                dashView.classList.remove('hidden');
+
+                // Populate user profile info
+                const firstName = session.fullname.split(' ')[0];
+                document.getElementById('dash-user-firstname').textContent = firstName;
+                document.getElementById('dash-user-fullname').textContent = session.fullname;
+                document.getElementById('dash-user-email').textContent = session.email;
+                document.getElementById('dash-user-bio').textContent = session.bio || session.title;
+
+                document.getElementById('nav-avatar').src = session.avatar;
+                document.getElementById('dash-user-avatar').src = session.avatar;
+
+                // Populate Profile Form inputs
+                document.getElementById('edit-fullname').value = session.fullname;
+                document.getElementById('edit-title').value = session.title || '';
+                document.getElementById('edit-avatar').value = session.avatar || '';
+                document.getElementById('edit-bio').value = session.bio || '';
+            } else {
+                dashView.classList.add('hidden');
                 authView.classList.remove('hidden');
             }
-        });
+        }
+
+        // Run on Startup
+        renderApp();
     </script>
 </body>
 </html>
